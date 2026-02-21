@@ -1,0 +1,41 @@
+name: "Jupyter + Pyscript"
+slug: "jupyter_pyscript"
+description: "JupyterLab on HAOS with pyscript kernel; notebooks live in /config/pyscript; pyscript.conf generated from options"
+version: "0.1.0"
+arch: [amd64]
+startup: services
+boot: auto
+init: false
+
+ports:
+  8888/tcp: 8888
+
+map:
+  - config:rw
+
+options:
+  notebook_dir: "/config/pyscript"
+
+  # Pyscript kernel config
+  ha_host: "ha.home"      # or your HA IP (often better)
+  ha_url: "http://supervisor/core/"   # common inside add-ons
+  ha_token: ""                        # long-lived token (or see note below)
+
+  # Jupyter auth
+  jupyter_token: ""
+  jupyter_password: ""                # hashed (optional)
+
+  allow_origin: ""
+  extra_args: ""
+
+schema:
+  notebook_dir: str?
+  ha_host: str
+  ha_url: str
+  ha_token: str?
+
+  jupyter_token: str?
+  jupyter_password: str?
+
+  allow_origin: str?
+  extra_args: str?
