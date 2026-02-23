@@ -1,7 +1,7 @@
 name: "Jupyter + Pyscript"
 slug: "jupyter_pyscript"
 description: "JupyterLab on HAOS with pyscript kernel; notebooks live in /config/pyscript; pyscript.conf generated from options"
-version: "0.1.14"
+version: "0.1.26"
 arch: [amd64]
 startup: application
 boot: auto
@@ -22,6 +22,7 @@ environment:
   JUPYTER_CONFIG_DIR: "/data/.jupyter"
 
 options:
+  hass_host: ""
   notebook_dir: "/config/pyscript"
 
   # Jupyter auth
@@ -32,6 +33,7 @@ options:
   extra_args: ""
 
 schema:
+  hass_host: str
   notebook_dir: str
 
   jupyter_token: str?

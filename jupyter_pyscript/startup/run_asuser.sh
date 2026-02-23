@@ -10,8 +10,8 @@
     cat > "$PYSCRIPT_CONF" <<EOF
 [homeassistant]
 hass_host = ha.home
-hass_url = http://ha.home:8123
-hass_token = 
+hass_url = http://supervisor/core
+hass_token = $SUPERVISOR_TOKEN
 EOF
 
     if [ -f /data/options.json ]; then
