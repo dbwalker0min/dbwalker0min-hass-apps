@@ -1,5 +1,4 @@
 param(
-  [Parameter(Mandatory=$true)]
   [string]$Slug,
 
   # Your Samba server name/IP (must match your Windows share path)
@@ -23,23 +22,6 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
-function Bump-Semver([string]$v, [string]$part) {
-  if ($v -notmatch '^(?<maj>\d+)\.(?<min>\d+)\.(?<pat>\d+)(?<suffix>.*)$') {
-    throw "Version '$v' doesn't look like semver (e.g. 1.2.3)."
-  }
-  $maj = [int]$Matches.maj
-  $min = [int]$Matches.min
-  $pat = [int]$Matches.pat
-  $suffix = $Matches.suffix
-
-  switch ($part) {
-    "major" { $maj++; $min=0; $pat=0 }
-    "minor" { $min++; $pat=0 }
-    "patch" { $pat++ }
-  }
-  return "$maj.$min.$pat$suffix"
-}
 
 # ---- 1) bump version in config.yaml ----
 $configPath = Join-Path $PSScriptRoot "..\config.yaml"
