@@ -29,15 +29,13 @@ options:
   jupyter_token: ""
   jupyter_password: ""                # hashed (optional)
 
-  allow_origin: ""
   extra_args: ""
 
 schema:
   hass_host: str
-  notebook_dir: str
+  notebook_dir: str?
 
   jupyter_token: str?
   jupyter_password: str?
 
-  allow_origin: str?
   extra_args: str?

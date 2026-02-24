@@ -1,9 +1,23 @@
-FROM dbwalker/jupyter-pyscript
+FROM quay.io/jupyter/minimal-notebook:python-3.11
 
 USER root
-COPY --chmod=700 startup/run_asroot.sh /usr/local/bin/before-notebook.d/05set_permissions.sh
-COPY --chmod=700 --chown=1000:100 startup /startup
 
-# The image will run as root, perform necessary setup, then drop privileges to run the 
-# main command as the jovyan user
-CMD ["/startup/run_asuser.sh"]
+# Make ./notebooks/modules importable as a top-level package root (e.g. `import stubs...`).
+# This path exists at runtime via the bind mount in docker-compose.yml.
+ENV PYTHONPATH=/home/jovyan/work/modules
+
+# Install other Python modules and JupyterLab extensions, then clean up
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt \
+    && jupyter pyscript install \
+    && rm /tmp/requirements.txt \
+    && fix-permissions "${CONDA_DIR}" \
+    && fix-permissions "/home/${NB_USER}"
+
+# install additional conda scripts to set permissions and generate pyscript.conf at startup
+COPY --chmod=755 before-notebook.d /usr/local/bin/before-notebook.d
+
+RUN chmod -x /usr/local/bin/before-notebook.d/15create-pyscript-conf.py
+
+# USER ${NB_USER}
+
