@@ -1,0 +1,8 @@
+{
+  "VsCodeTaskButtons.tasks": [
+    {
+      "label": "$(warning) Run Integration Tests",
+      "task": "Deploy",
+    }
+  ]
+}

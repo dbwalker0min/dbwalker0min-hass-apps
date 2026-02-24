@@ -1,0 +1,23 @@
+configuration:
+  notebook_dir:
+    name: Notebook Directory
+    description: The directory where Jupyter notebooks will be stored (default: /config/pyscript)
+  
+  jupyter_token:
+    name: Jupyter Token
+    description: >
+      The token used for Jupyter authentication (optional). If not set, Jupyter will start with
+      a random token.
+  
+  jupyter_password:
+    name: Jupyter Password
+    description: >
+      Password for Jupyter authentication (optional). If set, this password will be hashed appropriately for 
+      Jupyter. If not set, Jupyter will start without a password.
+  
+  extra_args:
+    name: Extra Jupyter Arguments
+    description: >
+      Additional command line arguments to pass to the Jupyter server (optional). For example, you could set
+      `--allow-root` here if you want to run Jupyter as root (not recommended). The string is interpreted as 
+      a shell command, so you can include multiple arguments here if needed.

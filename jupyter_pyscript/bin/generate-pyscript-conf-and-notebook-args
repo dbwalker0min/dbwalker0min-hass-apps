@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+
+import os
+import json
+import shlex
+from jupyter_server.auth import passwd
+
+"""
+This script runs at startup before the notebook server starts. It reads the options from the options file, 
+validates them, and writes the pyscript.conf file that the pyscript kernel will read to connect to Home Assistant.
+
+The following environment variables can also be set:
+    - NOTEBOOK_ARGS - additional arguments to pass to jupyter when it starts
+"""
+
+# The option file with the options from the user, mounted as a volume by the addon
+OPTION_FILE = "/data/options.json"
+
+# The location of the pyscript.conf file that the pyscript kernel will read for Home Assistant connection info
+CONF_FILE = "/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf"
+
+# Parse the options file
+options = json.load(open(OPTION_FILE))
+
+# write the configuration file
+with open(CONF_FILE, "w") as f:
+    f.write(f"""\
+[homeassistant]
+hass_host = localhost
+hass_url = http://supervisor/core
+hass_token = {os.getenv('SUPERVISOR_TOKEN', 'NO_TOKEN_PROVIDED')}                 
+""")
+    
+# Now compute the environment variables to pass to the notebook server based on the options and print them in a way that can be eval'd by the shell script that calls this python script.
+arguments: list[str] = shlex.split(options.get("extra_args", ""))
+
+# add the notebook directory
+if o := options.get("notebook_dir", ""):
+    arguments.append(f"--ServerApp.root_dir={o}")
+
+# Auth password wins, else token, else auto-token
+if o := options.get("jupyter_password", ""):
+    arguments.append(f"--IdentityProvider.password={passwd(o)}")
+elif o := options.get("jupyter_token", ""):
+    arguments.append(f"--IdentityProvider.token={o}")
+# Otherwise, Jupyter will auto-generate a token and print it to the console, which is fine for our use case since we don't need to know the token in advance.
+
+print(shlex.join(arguments))   # print it in a way that can be eval'd by the shell script that calls this python script
