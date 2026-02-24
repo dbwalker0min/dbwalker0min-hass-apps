@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "HA: Build + Deploy (bump patch, reload)",
+            "label": "Deploy",
             "type": "shell",
             "command": "pwsh",
             "args": [
