@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import json
 import shlex
@@ -20,16 +22,11 @@ CONF_FILE = "/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf"
 # Parse the options file
 options = json.load(open(OPTION_FILE))
 
-# make sure that hass_host is specified and not empty, since it's required for the kernel to 
-# connect to Home Assistant.
-if not options.get("hass_host"):
-    exit("hass_host must be specified in options and cannot be empty")
-
 # write the configuration file
 with open(CONF_FILE, "w") as f:
     f.write(f"""\
 [homeassistant]
-hass_host = {options.get('hass_host')}
+hass_host = localhost
 hass_url = http://supervisor/core
 hass_token = {os.getenv('SUPERVISOR_TOKEN', 'NO_TOKEN_PROVIDED')}                 
 """)
@@ -48,5 +45,4 @@ elif o := options.get("jupyter_token", ""):
     arguments.append(f"--IdentityProvider.token={o}")
 # Otherwise, Jupyter will auto-generate a token and print it to the console, which is fine for our use case since we don't need to know the token in advance.
 
-if arguments:
-    print(f"export NOTEBOOK_ARGS={shlex.quote(shlex.join(arguments))}")   # print it in a way that can be eval'd by the shell script that calls this python script
+print(shlex.join(arguments))   # print it in a way that can be eval'd by the shell script that calls this python script

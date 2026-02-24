@@ -14,7 +14,10 @@
                 "${file}"
             ],
             "problemMatcher": [],
-            "group": "build"
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

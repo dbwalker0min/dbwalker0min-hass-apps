@@ -23,7 +23,8 @@ $ErrorActionPreference = "Stop"
 # Find the slug of the add-on to build based on the input file path, which can be anywhere in the add-on repo. (Usually a file you just edited.)
 $inputFilePath = (Resolve-Path $input_file).Path
 $root = git rev-parse --show-toplevel
-$DebugPreference = "Continue"
+
+# $DebugPreference = "Continue"
 Write-Debug "Input file path: $inputFilePath"
 Write-Debug "Repo root: $root"
 
@@ -67,10 +68,10 @@ $src = $addonPath
 
 $excludeDirs = @(
     ".git", ".vscode", "__pycache__", ".pytest_cache", ".mypy_cache",
-    "dist", "build", ".ruff_cache", ".venv", "node_modules"
+    "dist", "build", ".ruff_cache", ".venv", "node_modules, config", "data"
 )
 
-$excludeFiles = @("*.pyc", "*.pyo", "*.tmp")
+$excludeFiles = @("*.pyc", "*.pyo", "*.tmp", ".bumpversion.cfg")
 
 $rcArgs = @(
     $src, $dst,
@@ -89,22 +90,15 @@ if ($rc -gt 7) { throw "robocopy failed with exit code $rc" }
 # ---- 3) tell HA to reload add-on info ----
 # Uses the HA CLI on the HA box, via SSH.
 # (/addons/reload exists; CLI calls into Supervisor.) :contentReference[oaicite:2]{index=2}
-Write-Host "Reloading add-on info on HA via SSH..."
-& ssh "$HaSshHost" "ha apps reload" | Out-Host
-
 # Optional: show info (nice feedback loop)
-& ssh "$HaSshHost" "ha apps info $Slug" | Out-Host
 
 # ---- 4) optional rebuild/update + restart ----
 if ($Rebuild) {
     Write-Host "Rebuilding add-on..."
-    # For local build add-ons, rebuild is often the right verb (Supervisor has /addons/<addon>/rebuild). :contentReference[oaicite:3]{index=3}
-    & ssh "root@$HaSshHost" "ha apps rebuild $Slug" | Out-Host
 }
 
 if ($Restart) {
     Write-Host "Restarting add-on..."
-    & ssh "root@$HaSshHost" "ha apps restart $Slug" | Out-Host
 }
 
 Write-Host "Done."

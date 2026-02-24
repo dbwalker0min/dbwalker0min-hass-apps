@@ -2,10 +2,6 @@ FROM quay.io/jupyter/minimal-notebook:python-3.11
 
 USER root
 
-# Make ./notebooks/modules importable as a top-level package root (e.g. `import stubs...`).
-# This path exists at runtime via the bind mount in docker-compose.yml.
-ENV PYTHONPATH=/home/jovyan/work/modules
-
 # Install other Python modules and JupyterLab extensions, then clean up
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt \
@@ -15,9 +11,8 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt \
     && fix-permissions "/home/${NB_USER}"
 
 # install additional conda scripts to set permissions and generate pyscript.conf at startup
-COPY --chmod=755 before-notebook.d /usr/local/bin/before-notebook.d
+COPY --chmod=755 bin/before-notebook.d/*.sh /usr/local/bin/before-notebook.d/
+COPY --chmod=755 bin/generate-pyscript-conf-and-notebook-args /usr/local/bin/
 
-RUN chmod -x /usr/local/bin/before-notebook.d/15create-pyscript-conf.py
-
-# USER ${NB_USER}
-
+# Allow to start as root. This will allow me to fix permissions on any mounted volumes at startup, and then drop
+# down to the jovyan user before starting Jupyter.

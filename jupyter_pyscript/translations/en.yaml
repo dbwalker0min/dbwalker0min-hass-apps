@@ -1,8 +1,4 @@
 configuration:
-  hass_host:
-    name: Home Assistant Host
-    description: The hostname or IP address of your Home Assistant instance
-  
   notebook_dir:
     name: Notebook Directory
     description: The directory where Jupyter notebooks will be stored (default: /config/pyscript)

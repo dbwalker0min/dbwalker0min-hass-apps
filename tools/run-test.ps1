@@ -3,7 +3,9 @@
 & docker run --rm -it `
     -v "$((Resolve-Path "jupyter_pyscript\config").Path):/config:rw" `
     -v "$((Resolve-Path "jupyter_pyscript\data").Path):/data:rw" `
-    -p 8888:8888 `
+    -e "JUPYTER_CONFIG_DIR=/data/.jupyter" -e "PYTHONPATH=/config/pyscript/modules" `
+    -e "CHOWN_EXTRA=/config/pyscript,/data" -e "CHOWN_EXTRA_OPTS=-R" `
+    --network=host `
     haaddonjupyterpyscript:latest
 
 
