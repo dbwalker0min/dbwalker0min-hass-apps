@@ -1,7 +1,7 @@
 name: "Jupyter + Pyscript"
 slug: "jupyter_pyscript"
 description: "JupyterLab on HAOS with pyscript kernel; notebooks live in /config/pyscript; pyscript.conf generated from options"
-version: "0.1.26"
+version: "0.1.27"
 arch: [amd64]
 startup: application
 boot: auto
@@ -20,6 +20,7 @@ homeassistant_api: true
 
 environment:
   JUPYTER_CONFIG_DIR: "/data/.jupyter"
+  PYTHONPATH: /config/pyscript/modules
 
 options:
   hass_host: ""

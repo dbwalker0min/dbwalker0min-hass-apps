@@ -1,7 +1,8 @@
 param(
-    [Parameter(Mandatory = $true, Position = 0)]
+    # A file path anywhere inside the add-on repo (usually a file you just edited). Used to determine which add-on to build.
+    [Parameter(Mandatory = $true)]  
     [string]$input_file,
-
+    
     # Your Samba server name/IP (must match your Windows share path)
     [string]$SambaHost = "homeassistant",
 
