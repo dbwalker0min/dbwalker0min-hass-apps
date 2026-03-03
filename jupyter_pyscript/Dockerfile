@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt \
 
 # install additional conda scripts to set permissions and generate pyscript.conf at startup
 COPY --chmod=755 bin/before-notebook.d/*.sh /usr/local/bin/before-notebook.d/
-COPY --chmod=755 bin/generate-pyscript-conf-and-notebook-args /usr/local/bin/
+COPY --chmod=755 bin/* /usr/local/bin/
 
 # Allow to start as root. This will allow me to fix permissions on any mounted volumes at startup, and then drop
 # down to the jovyan user before starting Jupyter.
