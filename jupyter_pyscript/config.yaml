@@ -1,7 +1,7 @@
 name: "Jupyter + Pyscript"
 slug: "jupyter_pyscript"
 description: "JupyterLab on HAOS with pyscript kernel; notebooks live in /config/pyscript; pyscript.conf generated from options"
-version: "0.0.1"
+version: "0.2.1"
 arch:
   - amd64
   - aarch64
@@ -9,12 +9,6 @@ arch:
 startup: application
 boot: auto
 init: false
-
-# host_network is enabled to make Jupyter reachable directly on the host/LAN without
-# additional port mapping complexity in this add-on setup. Home Assistant API access for
-# the pyscript kernel is provided via Supervisor (`homeassistant_api: true` and
-# `http://supervisor/core`), not by host networking itself.
-host_network: true
 
 map:
   - type: config
@@ -24,25 +18,39 @@ map:
 
 homeassistant_api: true
 
+ports:
+  8888/tcp: 8888
+
 environment:
-  JUPYTER_CONFIG_DIR: /data/.jupyter
-  PYTHONPATH: /config/pyscript/modules
-  CHOWN_EXTRA: /config/pyscript,/data
-  CHOWN_EXTRA_OPTS: -R
+  JUPYTER_CONFIG_DIR: "/data/.jupyter"
+  PYTHONPATH: "/config/pyscript/modules"
+  CHOWN_EXTRA: "/config/pyscript,/data"
+  CHOWN_EXTRA_OPTS: "-R"
 
 options:
   notebook_dir: "/config/pyscript"
 
-  # Jupyter auth
-  jupyter_token: ""
-  jupyter_password: ""                # hashed (optional)
+  jupyter_auth:
+    jupyter_token: ""
+    jupyter_password: ""
+
+  hass_auth:
+    hass_host: ""
+    hass_url: ""
+    hass_token: ""
 
   extra_args: ""
 
 schema:
-  notebook_dir: str?
+  notebook_dir: str
 
-  jupyter_token: str?
-  jupyter_password: str?
+  jupyter_auth:
+    jupyter_token: str?
+    jupyter_password: str?
+  
+  hass_auth:
+    hass_host: str?
+    hass_url: str?
+    hass_token: str?
 
-  extra_args: str?
+  extra_args: str

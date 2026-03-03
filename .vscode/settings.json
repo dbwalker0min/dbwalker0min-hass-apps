@@ -4,5 +4,6 @@
       "label": "$(warning) Run Integration Tests",
       "task": "Deploy",
     }
-  ]
+  ],
+  "files.eol": "\n"
 }
