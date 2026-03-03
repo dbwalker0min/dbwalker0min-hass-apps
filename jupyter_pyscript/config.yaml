@@ -1,7 +1,7 @@
 name: "Jupyter + Pyscript"
 slug: "jupyter_pyscript"
 description: "JupyterLab on HAOS with pyscript kernel; notebooks live in /config/pyscript; pyscript.conf generated from options"
-version: "999.0.14"
+version: "0.2.0"
 arch:
   - amd64
   - aarch64
