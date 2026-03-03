@@ -31,13 +31,13 @@ options:
   notebook_dir: "/config/pyscript"
 
   jupyter_auth:
-    jupyter_token: null
-    jupyter_password: null
+    jupyter_token: ""
+    jupyter_password: ""
 
   hass_auth:
-    hass_host: null
-    hass_url: null
-    hass_token: null
+    hass_host: ""
+    hass_url: ""
+    hass_token: ""
 
   extra_args: ""
 

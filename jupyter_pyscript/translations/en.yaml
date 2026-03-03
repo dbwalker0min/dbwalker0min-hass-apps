@@ -1,7 +1,8 @@
 configuration:
   notebook_dir:
     name: Notebook Directory
-    description: The directory where Jupyter notebooks will be stored (default: /config/pyscript)
+    description: >
+      The directory where Jupyter notebooks will be stored (default: /config/pyscript)
   
   jupyter_auth:
     name: Jupyter Authentication
