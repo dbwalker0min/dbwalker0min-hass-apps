@@ -1,6 +1,10 @@
-FROM quay.io/jupyter/minimal-notebook:python-3.11
+FROM  :python-3.11
 
 USER root
+
+# Install lnav for log viewing
+RUN apt update \
+    && apt install -y lnav
 
 # Install other Python modules and JupyterLab extensions, then clean up
 COPY requirements.txt /tmp/requirements.txt
