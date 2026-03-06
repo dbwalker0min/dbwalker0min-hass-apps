@@ -2,6 +2,7 @@ name: "Jupyter + Pyscript"
 slug: "jupyter_pyscript"
 description: "JupyterLab on HAOS with pyscript kernel; notebooks live in /config/pyscript; pyscript.conf generated from options"
 version: "0.2.4"
+image: "ghcr.io/dbwalker0min/{arch}-addon-jupyter_pyscript"
 arch:
   - amd64
   - aarch64
@@ -23,7 +24,7 @@ ports:
 
 environment:
   JUPYTER_CONFIG_DIR: "/data/.jupyter"
-  PYTHONPATH: "/config/pyscript/modules"
+  PYTHONPATH: "/opt/typehints;/config/pyscript/modules"
   CHOWN_EXTRA: "/config/pyscript,/data"
   CHOWN_EXTRA_OPTS: "-R"
 

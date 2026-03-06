@@ -2,5 +2,3 @@ jupyterlab-lsp==5.2.0
 python-lsp-server[all]==1.14.0
 pyscript==0.3.3
 hass_pyscript_kernel==1.0.0
-homeassistant-stubs==2024.3.3
-voluptuous==0.13.1

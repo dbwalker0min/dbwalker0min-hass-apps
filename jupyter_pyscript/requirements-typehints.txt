@@ -1,0 +1,2 @@
+homeassistant-stubs==2024.3.3
+voluptuous==0.13.1
