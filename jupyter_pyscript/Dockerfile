@@ -15,16 +15,12 @@ COPY requirements-*.txt /tmp/
 # pip w/ cache mount
 RUN --mount=type=cache,target=/root/.cache/pip \
     python -m pip install --no-cache-dir -r /tmp/requirements-runtime.txt \
+    && python -m pip install --no-cache-dir hass-jupyter-ext \
     && python -m pip install --no-cache-dir --no-deps --target=/opt/typehints -r /tmp/requirements-typehints.txt \
     && python -c "import site; open(site.getsitepackages()[0] + '/typehints.pth','w').write('/opt/typehints\n')" \
     && rm -f /tmp/requirements-*.txt \
     && fix-permissions "${CONDA_DIR}" \
-    && fix-permissions "/home/${NB_USER}"
-
-COPY python_wheels/*.whl /tmp/
-RUN --mount=type=cache,target=/root/.cache/pip \
-    python -m pip install --no-cache-dir /tmp/*.whl \
-    && rm -f /tmp/*.whl \
+    && fix-permissions "/home/${NB_USER}" \
     && jupyter pyscript install \
     && jupyter server extension list \
     && jupyter labextension list

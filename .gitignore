@@ -1,3 +1,4 @@
 data/
 config/
 .buildx-cache/
+.buildx-cache-new/
