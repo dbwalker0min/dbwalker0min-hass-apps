@@ -1,74 +1,76 @@
 # Home Assistant Add-on: Jupyter + Pyscript
 
-Run JupyterLab and a pyscript-capable kernel together inside Home Assistant OS.
+Run JupyterLab with a pyscript-capable kernel inside Home Assistant OS.
 
-This add-on is designed for interactive development under `/config/pyscript`, and auto-generates kernel-side `pyscript.conf` at startup so notebook code can call into Home Assistant.
+This add-on is designed for interactive development under `/config/pyscript` and generates kernel-side `pyscript.conf` at startup so notebooks can call into Home Assistant.
 
 ## Features
 
-- JupyterLab + pyscript kernel in one add-on.
+- JupyterLab plus pyscript kernel in one add-on.
 - Notebook root defaults to `/config/pyscript`.
-- Auto-generated `pyscript.conf` at startup.
-- Authentication via Jupyter token or password.
+- Startup-generated `pyscript.conf` for kernel Home Assistant connectivity.
+- Configurable Jupyter auth (password or token).
+- Configurable Home Assistant connection overrides.
 - Supports `amd64` and `aarch64`.
 
-## How startup works
+## Startup behavior
 
 At add-on startup:
 
 1. Options are read from `/data/options.json`.
-2. `pyscript.conf` is written to:
+2. Environment variables are generated:
+   - `HASS_HOST` (default `supervisor`)
+   - `HASS_URL` (default `http://supervisor/core`)
+   - `HASS_TOKEN` (default `$SUPERVISOR_TOKEN`)
+   - `NOTEBOOK_ARGS` (built from `extra_args`, `notebook_dir`, and Jupyter auth options)
+3. `pyscript.conf` is written to:
    - `/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf`
-3. Jupyter args are built from configured options and exported through `NOTEBOOK_ARGS`.
-
-Home Assistant API access for the kernel is provided through Supervisor (`homeassistant_api: true` and `http://supervisor/core`). The
-token from the environment variable `SUPERVISOR_TOKEN` is used to authenticate access.
+4. Jupyter starts using `NOTEBOOK_ARGS`.
 
 ## Configuration options
 
 From `jupyter_pyscript/config.yaml`:
 
-- `notebook_dir` (optional string)
-  - Passed as `--ServerApp.root_dir=...`
-  - Default: `/config/pyscript`
-- `jupyter_token` (optional string)
-  - Explicit Jupyter token.
-- `jupyter_password` (optional string)
-  - Plain password in add-on config; hashed at startup before being passed to Jupyter.
+- `notebook_dir` (string, default `/config/pyscript`)
+  - Passed as `--ServerApp.root_dir=...`.
+
+- `jupyter_auth` (object)
+  - `jupyter_token` (optional string)
+  - `jupyter_password` (optional string, hashed at startup)
+
+- `hass_auth` (object)
+  - `hass_host` (optional string, default `supervisor`)
+  - `hass_url` (optional string, default `http://supervisor/core`)
+  - `hass_token` (optional string, falls back to `$SUPERVISOR_TOKEN`)
+
 - `extra_args` (optional string)
-  - Additional command-line args appended to Jupyter launch args.
+  - Additional Jupyter CLI arguments; parsed with shell-style quoting.
 
-Authentication precedence:
+### Jupyter authentication precedence
 
-1. `jupyter_password`
-2. `jupyter_token`
-3. auto-generated Jupyter token
+1. `jupyter_auth.jupyter_password`
+2. `jupyter_auth.jupyter_token`
+3. Jupyter auto-generated token
 
 ## Install and run
 
-1. Add this repository to the Home Assistant Add-on Store:
-  - `https://github.com/dbwalker0min/dbwalker0min-hass-apps`
-2. Install **Jupyter + Pyscript** from that repository.
-3. Configure options (at minimum verify `notebook_dir`).
+1. Add this repository to Home Assistant Add-on Store repositories:
+   - `https://github.com/dbwalker0min/dbwalker0min-hass-apps`
+2. Install **Jupyter + Pyscript**.
+3. Configure add-on options (minimum: verify `notebook_dir`).
 4. Start the add-on.
-5. Open Jupyter from the add-on network endpoint.
+5. Open Jupyter via port `8888` on your Home Assistant host.
 
-## Development docs
+## Development and releases
 
-For local build/smoke test/deploy details, see `../docs/development.md`.
-For release notes, see `CHANGELOG.md`.
+- Development workflow: `../docs/development.md`
+- Release notes: `CHANGELOG.md`
 
 ## Security notes
 
-- Do not commit long-lived tokens/secrets.
-- Do not log full startup args if they can contain auth values.
-- Prefer token/password auth; avoid unauthenticated Jupyter on shared or untrusted networks.
-- `host_network: true` is used for direct host/LAN reachability. It is not required for Supervisor API access, and it increases exposure versus ingress-first designs.
-
-## Current trade-offs
-
-- `host_network: true` is convenient for direct access but has broader network exposure.
-- Dependency pins are explicit for reproducibility; they should be reviewed periodically.
+- Do not commit long-lived secrets.
+- Prefer password or token auth for Jupyter.
+- Keep Home Assistant token scope minimal and rotate when needed.
 
 ## License
 
