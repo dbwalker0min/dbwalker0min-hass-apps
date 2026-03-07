@@ -47,8 +47,15 @@ Current behavior of `tools/ha-build.ps1`:
 
 ## Notes on networking and API access
 
-- `host_network: true` is enabled in this project for direct host/LAN reachability.
-- Home Assistant API access for the kernel is provided via Supervisor (`homeassistant_api: true` and `http://supervisor/core`).
+- Add-on config does not enable `host_network`; it exposes Jupyter on port `8888`.
+- Local smoke test (`tools/run-test.ps1`) uses Docker `--network=host` for convenience during local runs.
+- Home Assistant API access for the kernel is provided via Supervisor (`homeassistant_api: true`) with default URL `http://supervisor/core`.
+
+## Runtime option handling
+
+- Jupyter auth options are nested under `jupyter_auth` (`jupyter_token`, `jupyter_password`).
+- Home Assistant connection overrides are nested under `hass_auth` (`hass_host`, `hass_url`, `hass_token`).
+- Startup scripts generate `HASS_HOST`, `HASS_URL`, `HASS_TOKEN`, and `NOTEBOOK_ARGS`, then write `pyscript.conf` for the kernel.
 
 ## Safe update checklist
 
