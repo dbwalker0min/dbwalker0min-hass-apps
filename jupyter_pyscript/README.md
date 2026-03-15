@@ -1,31 +1,17 @@
-# Home Assistant Add-on: Jupyter + Pyscript
+# Home Assistant App: Jupyter + Pyscript
 
 Run JupyterLab with a pyscript-capable kernel inside Home Assistant OS.
 
-This add-on is designed for interactive development under `/config/pyscript` and generates kernel-side `pyscript.conf` at startup so notebooks can call into Home Assistant.
+This add-on is designed for interactive development under `/config/pyscript` and generates kernel-side `pyscript.conf` at startup so notebooks can call into Home Assistant. There is also a Jupyter extension to add an "HA" menu to regenerate Pyscript stubs and to reload the Home Assistant YAML configuration.
 
 ## Features
 
-- JupyterLab plus pyscript kernel in one add-on.
+- JupyterLab plus Pyscript kernel in one add-on.
+- JupyterLab extension for reloading YAML configuration and rebuilding Pyscript stubs.
 - Notebook root defaults to `/config/pyscript`.
 - Startup-generated `pyscript.conf` for kernel Home Assistant connectivity.
 - Configurable Jupyter auth (password or token).
-- Configurable Home Assistant connection overrides.
 - Supports `amd64` and `aarch64`.
-
-## Startup behavior
-
-At add-on startup:
-
-1. Options are read from `/data/options.json`.
-2. Environment variables are generated:
-   - `HASS_HOST` (default `supervisor`)
-   - `HASS_URL` (default `http://supervisor/core`)
-   - `HASS_TOKEN` (default `$SUPERVISOR_TOKEN`)
-   - `NOTEBOOK_ARGS` (built from `extra_args`, `notebook_dir`, and Jupyter auth options)
-3. `pyscript.conf` is written to:
-   - `/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf`
-4. Jupyter starts using `NOTEBOOK_ARGS`.
 
 ## Configuration options
 
@@ -46,11 +32,23 @@ From `jupyter_pyscript/config.yaml`:
 - `extra_args` (optional string)
   - Additional Jupyter CLI arguments; parsed with shell-style quoting.
 
-### Jupyter authentication precedence
+### Jupyter authentication
 
-1. `jupyter_auth.jupyter_password`
-2. `jupyter_auth.jupyter_token`
-3. Jupyter auto-generated token
+Jupyter supports several different levels of authentication. If a password is specified, then password protection will be used. If a token is provided, then it will be used. Otherwise, a random token will be generated and used.
+
+## Startup behavior
+
+At app startup:
+
+1. Options are read from `/data/options.json`.
+2. Environment variables are generated:
+   - `HASS_HOST` (default `localhost`)
+   - `HASS_URL` (default `http://localhost:8123`)
+   - `HASS_TOKEN` (default `""`)
+   - `NOTEBOOK_ARGS` (built from `extra_args`, `notebook_dir`, and Jupyter auth options)
+3. `pyscript.conf` is written to:
+   - `/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf`
+4. Jupyter starts using `NOTEBOOK_ARGS`.
 
 ## Install and run
 
