@@ -58,6 +58,6 @@ jobs:
           push: true
           tags: |
             ${{ matrix.image }}:${{ steps.vars.outputs.version }}
+            ${{ matrix.image }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          
