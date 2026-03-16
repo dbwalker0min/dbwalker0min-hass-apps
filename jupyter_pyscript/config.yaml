@@ -25,7 +25,7 @@ ports:
 
 environment:
   JUPYTER_CONFIG_DIR: "/data/.jupyter"
-  PYTHONPATH: "/opt/typehints;/config/pyscript/modules"
+  PYTHONPATH: "/opt/typehints:/config/pyscript/modules"
   CHOWN_EXTRA: "/config/pyscript,/data"
   CHOWN_EXTRA_OPTS: "-R"
 
