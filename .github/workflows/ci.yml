@@ -1,0 +1,83 @@
+name: CI validation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate add-on
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate YAML files
+        shell: bash
+        run: |
+          echo "Validating YAML files..."
+          find . -name "*.yaml" -o -name "*.yml" | grep -v '.git/' | while read -r f; do
+            python -c "import yaml, sys; yaml.safe_load_all(open('$f'))" \
+              && echo "OK: $f" \
+              || { echo "FAIL: $f"; exit 1; }
+          done
+
+      - name: Validate add-on structure
+        shell: bash
+        run: |
+          echo "Checking required add-on files..."
+          for f in \
+            jupyter_pyscript/config.yaml \
+            jupyter_pyscript/Dockerfile \
+            jupyter_pyscript/CHANGELOG.md \
+            jupyter_pyscript/README.md \
+            jupyter_pyscript/translations/en.yaml; do
+            [ -f "$f" ] && echo "OK: $f" || { echo "MISSING: $f"; exit 1; }
+          done
+
+      - name: Check version consistency
+        shell: bash
+        run: |
+          echo "Checking version consistency..."
+
+          # Version from config.yaml
+          CONFIG_VERSION=$(python -c "
+          import yaml
+          with open('jupyter_pyscript/config.yaml') as f:
+              c = yaml.safe_load(f)
+          print(c['version'])
+          ")
+          echo "config.yaml version: $CONFIG_VERSION"
+
+          # Version from .bumpversion.cfg
+          BUMP_VERSION=$(grep '^current_version' jupyter_pyscript/.bumpversion.cfg | awk '{print $3}')
+          echo ".bumpversion.cfg version: $BUMP_VERSION"
+
+          # Version must appear as a release header in CHANGELOG.md
+          if ! grep -qE "^## ${CONFIG_VERSION} " jupyter_pyscript/CHANGELOG.md; then
+            echo "ERROR: No CHANGELOG.md entry found for version ${CONFIG_VERSION}"
+            exit 1
+          fi
+          echo "CHANGELOG.md has entry for ${CONFIG_VERSION}"
+
+          # Versions must agree
+          if [ "$CONFIG_VERSION" != "$BUMP_VERSION" ]; then
+            echo "ERROR: config.yaml version (${CONFIG_VERSION}) does not match .bumpversion.cfg (${BUMP_VERSION})"
+            exit 1
+          fi
+
+          echo "Version consistency OK: ${CONFIG_VERSION}"

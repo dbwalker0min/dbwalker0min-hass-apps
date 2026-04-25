@@ -49,6 +49,16 @@ jobs:
             echo "version=dev" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Compute image tags
+        id: tags
+        shell: bash
+        run: |
+          TAGS="${{ matrix.image }}:${{ steps.vars.outputs.version }}"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            TAGS="${TAGS},${{ matrix.image }}:latest"
+          fi
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -56,8 +66,6 @@ jobs:
           file: ./jupyter_pyscript/Dockerfile
           platforms: ${{ matrix.platform }}
           push: true
-          tags: |
-            ${{ matrix.image }}:${{ steps.vars.outputs.version }}
-            ${{ matrix.image }}:latest
+          tags: ${{ steps.tags.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

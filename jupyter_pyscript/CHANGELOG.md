@@ -16,11 +16,10 @@ All notable changes to this add-on are documented in this file.
 ### Security
 - 
 
-## 999.1.34 - 2026-02-24
+## 0.2.8 - 2026-02-24
 
 ### Changed
 - Added `aarch64` support in add-on architecture list.
-- Removed unused `hass_host` option/schema/translation wiring.
 - Clarified `host_network` rationale in `config.yaml` comments.
 - Split docs into user-facing root README and development notes.
 
@@ -28,13 +27,13 @@ All notable changes to this add-on are documented in this file.
 - Removed startup logging of generated notebook arguments.
 - Removed committed token value from test helper workflow.
 
-## 999.1.33 - 2026-02-24
+## 0.2.7 - 2026-02-24
 
 ### Changed
 - Pinned Python dependency versions in `requirements.txt` for reproducible builds.
 - Stopped installing `notebook` and `jupyterlab` explicitly from `requirements.txt` (provided by base image).
 
-## 999.1.32 - 2026-02-24
+## 0.2.6 - 2026-02-24
 
 ### Added
 - Initial repository/app documentation and local development notes.

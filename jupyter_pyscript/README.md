@@ -41,10 +41,10 @@ Jupyter supports several different levels of authentication. If a password is sp
 At app startup:
 
 1. Options are read from `/data/options.json`.
-2. Environment variables are generated:
-   - `HASS_HOST` (default `localhost`)
-   - `HASS_URL` (default `http://localhost:8123`)
-   - `HASS_TOKEN` (default `""`)
+2. Environment variables are generated with the following precedence:
+   - `HASS_HOST`: user-supplied `hass_auth.hass_host` → `supervisor`
+   - `HASS_URL`: user-supplied `hass_auth.hass_url` → `http://supervisor/core`
+   - `HASS_TOKEN`: user-supplied `hass_auth.hass_token` → `$SUPERVISOR_TOKEN`
    - `NOTEBOOK_ARGS` (built from `extra_args`, `notebook_dir`, and Jupyter auth options)
 3. `pyscript.conf` is written to:
    - `/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf`

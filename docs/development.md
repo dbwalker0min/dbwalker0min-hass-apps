@@ -64,3 +64,14 @@ Current behavior of `tools/ha-build.ps1`:
 3. Deploy with `tools/ha-build.ps1`.
 4. Start/restart add-on in Home Assistant.
 5. Confirm Jupyter launch and pyscript kernel connectivity.
+
+## Release automation (future improvements)
+
+Potential improvements to the release workflow:
+
+- **Auto-generate changelog entries** from conventional commits (e.g., using `git-cliff` or `conventional-changelog`).
+- **Enforce version bump via CI** — fail the CI check if `config.yaml` version and `CHANGELOG.md` are out of sync with the latest git tag on `main`.
+- **Separate `dev` and `release` workflows** more cleanly:
+  - `workflow_dispatch` → build + push `:dev` tag only.
+  - `push: tags: v*` → build + push `:{version}` and `:latest` tags.
+  - See `.github/workflows/build-addon.yml` for the current implementation of this separation.
