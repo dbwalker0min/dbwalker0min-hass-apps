@@ -19,20 +19,17 @@ configuration:
   hass_host:
     name: Home Assistant Host
     description: >
-      The hostname or IP address of your Home Assistant instance (e.g., "homeassistant" or "192.168.1.100").
-      If no value is provided, the value `supervisor` will be used.
+      Required. The hostname or IP address of your Home Assistant instance (e.g., "homeassistant" or "192.168.1.100").
 
   hass_url:
     name: Home Assistant URL
     description: >
-      The URL of your Home Assistant instance (e.g., "http://homeassistant:8123" or "http://192.168.1.100:8123").
-      If no value is provided, the value `http://supervisor/core` will be used.
+      Required. The URL of your Home Assistant instance (e.g., "http://homeassistant:8123" or "http://192.168.1.100:8123").
 
   hass_token:
     name: Home Assistant Token
     description: >
-      The long-lived access token for your Home Assistant instance. 
-      If no value is provided, the contents of the environment variable `SUPERVISOR_TOKEN` will be used.
+      Required. The long-lived access token for your Home Assistant instance.
   
   extra_args:
     name: Extra Jupyter Arguments
