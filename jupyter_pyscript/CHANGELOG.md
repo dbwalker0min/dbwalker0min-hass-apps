@@ -8,7 +8,7 @@ All notable changes to this add-on are documented in this file.
 - 
 
 ### Changed
-- 
+- `hass_host`, `hass_url`, and `hass_token` under `hass_auth` are now required parameters with no defaults.
 
 ### Fixed
 - 

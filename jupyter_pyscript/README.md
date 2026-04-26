@@ -25,9 +25,9 @@ From `jupyter_pyscript/config.yaml`:
   - `jupyter_password` (optional string, hashed at startup)
 
 - `hass_auth` (object)
-  - `hass_host` (optional string, default `supervisor`)
-  - `hass_url` (optional string, default `http://supervisor/core`)
-  - `hass_token` (optional string, falls back to `$SUPERVISOR_TOKEN`)
+  - `hass_host` (required string)
+  - `hass_url` (required string)
+  - `hass_token` (required string)
 
 - `extra_args` (optional string)
   - Additional Jupyter CLI arguments; parsed with shell-style quoting.
@@ -42,9 +42,9 @@ At app startup:
 
 1. Options are read from `/data/options.json`.
 2. Environment variables are generated:
-   - `HASS_HOST` (default `localhost`)
-   - `HASS_URL` (default `http://localhost:8123`)
-   - `HASS_TOKEN` (default `""`)
+   - `HASS_HOST`
+   - `HASS_URL`
+   - `HASS_TOKEN`
    - `NOTEBOOK_ARGS` (built from `extra_args`, `notebook_dir`, and Jupyter auth options)
 3. `pyscript.conf` is written to:
    - `/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf`

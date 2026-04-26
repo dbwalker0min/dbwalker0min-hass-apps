@@ -24,15 +24,10 @@ with open(OPTION_FILE, "r", encoding="utf-8") as f:
 hass_auth = options.get("hass_auth") or {}
 jupyter_auth = options.get("jupyter_auth") or {}
 
-# Always define HA env vars
-HASS_HOST = coalesce_str(hass_auth.get("hass_host"), "supervisor")
-HASS_URL  = coalesce_str(hass_auth.get("hass_url"),  "http://supervisor/core")
-
-# If hass_token is unset/null/empty, fall back to SUPERVISOR_TOKEN (or empty string if not present)
-HASS_TOKEN = coalesce_str(
-    hass_auth.get("hass_token"),
-    os.environ.get("SUPERVISOR_TOKEN", "")
-)
+# Always define HA env vars (required parameters; values come directly from options)
+HASS_HOST = hass_auth.get("hass_host", "")
+HASS_URL  = hass_auth.get("hass_url",  "")
+HASS_TOKEN = hass_auth.get("hass_token", "")
 
 # Build NOTEBOOK_ARGS deterministically
 arguments = shlex.split(coalesce_str(options.get("extra_args"), ""))
