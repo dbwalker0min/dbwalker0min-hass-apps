@@ -9,7 +9,7 @@ This repository hosts Home Assistant add-ons maintained as separate app folders.
 Run JupyterLab and a pyscript-capable kernel in Home Assistant OS.
 
 - Add-on folder: `jupyter_pyscript/`
-- Add-on docs: `jupyter_pyscript/README.md`
+- Add-on docs: [jupyter_pyscript/README.md](jupyter_pyscript/README.md)
 - Changelog: `jupyter_pyscript/CHANGELOG.md`
 - Main add-on config: `jupyter_pyscript/config.yaml`
 
