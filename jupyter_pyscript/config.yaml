@@ -31,28 +31,18 @@ environment:
 
 options:
   notebook_dir: "/config/pyscript"
-
-  jupyter_auth:
-    jupyter_token: ""
-    jupyter_password: ""
-
-  hass_auth:
-    hass_host: ""
-    hass_url: ""
-    hass_token: ""
-
+  jupyter_token: ""
+  jupyter_password: ""
+  hass_host: ""
+  hass_url: ""
+  hass_token: ""
   extra_args: ""
 
 schema:
   notebook_dir: str
-
-  jupyter_auth:
-    jupyter_token: str?
-    jupyter_password: str?
-  
-  hass_auth:
-    hass_host: str
-    hass_url: str
-    hass_token: str
-
+  jupyter_token: str?
+  jupyter_password: str?
+  hass_host: str
+  hass_url: str
+  hass_token: str
   extra_args: str

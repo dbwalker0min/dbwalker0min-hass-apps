@@ -8,7 +8,7 @@ All notable changes to this add-on are documented in this file.
 - 
 
 ### Changed
-- `hass_host`, `hass_url`, and `hass_token` under `hass_auth` are now required parameters with no defaults.
+- Removed nested `jupyter_auth` and `hass_auth` configuration groups; `jupyter_token`, `jupyter_password`, `hass_host`, `hass_url`, and `hass_token` are now top-level options.
 
 ### Fixed
 - 
