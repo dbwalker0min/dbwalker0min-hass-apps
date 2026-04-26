@@ -54,7 +54,7 @@ Current behavior of `tools/ha-build.ps1`:
 ## Runtime option handling
 
 - Jupyter auth options are nested under `jupyter_auth` (`jupyter_token`, `jupyter_password`).
-- Home Assistant connection overrides are nested under `hass_auth` (`hass_host`, `hass_url`, `hass_token`).
+- Home Assistant connection parameters are nested under `hass_auth` (`hass_host`, `hass_url`, `hass_token`) and are **required** with no defaults.
 - Startup scripts generate `HASS_HOST`, `HASS_URL`, `HASS_TOKEN`, and `NOTEBOOK_ARGS`, then write `pyscript.conf` for the kernel.
 
 ## Safe update checklist

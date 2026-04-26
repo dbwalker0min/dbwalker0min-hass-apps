@@ -51,8 +51,8 @@ schema:
     jupyter_password: str?
   
   hass_auth:
-    hass_host: str?
-    hass_url: str?
-    hass_token: str?
+    hass_host: str
+    hass_url: str
+    hass_token: str
 
   extra_args: str
