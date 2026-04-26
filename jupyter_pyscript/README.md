@@ -20,14 +20,20 @@ From `jupyter_pyscript/config.yaml`:
 - `notebook_dir` (string, default `/config/pyscript`)
   - Passed as `--ServerApp.root_dir=...`.
 
-- `jupyter_auth` (object)
-  - `jupyter_token` (optional string)
-  - `jupyter_password` (optional string, hashed at startup)
+- `jupyter_token` (optional string)
+  - Token used for Jupyter authentication. If not set (and `jupyter_password` is not set), Jupyter will start with a random token.
 
-- `hass_auth` (object)
-  - `hass_host` (required string)
-  - `hass_url` (required string)
-  - `hass_token` (required string)
+- `jupyter_password` (optional string, hashed at startup)
+  - Password for Jupyter authentication. If set, takes precedence over `jupyter_token`.
+
+- `hass_host` (required string)
+  - Hostname or IP address of your Home Assistant instance.
+
+- `hass_url` (required string)
+  - URL of your Home Assistant instance.
+
+- `hass_token` (required string)
+  - Long-lived access token for your Home Assistant instance.
 
 - `extra_args` (optional string)
   - Additional Jupyter CLI arguments; parsed with shell-style quoting.

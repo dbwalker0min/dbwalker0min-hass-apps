@@ -4,46 +4,35 @@ configuration:
     description: >
       The directory where Jupyter notebooks will be stored (default: /config/pyscript)
   
-  jupyter_auth:
-    name: Jupyter Authentication
+  jupyter_token:
+    name: Jupyter Token
     description: >
-      Optional authentication settings for Jupyter. You can set a token or a password for Jupyter access. If neither is set, Jupyter will start with a random token and no password.
-    fields:
-      jupyter_token:
-        name: Jupyter Token
-        description: >
-          The token used for Jupyter authentication (optional). If not set (and the password is not set), Jupyter will start with
-          a random token.
-      
-      jupyter_password:
-        name: Jupyter Password
-        description: >
-          Password for Jupyter authentication (optional). If set, this password will be hashed appropriately for 
-          Jupyter. If not set, Jupyter will start without a password.
+      The token used for Jupyter authentication (optional). If not set (and the password is not set), Jupyter will start with
+      a random token.
   
-  hass_auth:
-    name: Home Assistant Authentication
+  jupyter_password:
+    name: Jupyter Password
     description: >
-      Authentication settings for Home Assistant. All entries are optional. 
-      If entries are not provided, then the Home Assistant supervisor is assumed.
-    fields:
-      hass_host:
-        name: Home Assistant Host
-        description: >
-          The hostname or IP address of your Home Assistant instance (e.g., "homeassistant" or "192.168.1.100").
-          If no value is provided, the value `supervisor` will be used.
+      Password for Jupyter authentication (optional). If set, this password will be hashed appropriately for 
+      Jupyter. If not set, Jupyter will start without a password.
+  
+  hass_host:
+    name: Home Assistant Host
+    description: >
+      The hostname or IP address of your Home Assistant instance (e.g., "homeassistant" or "192.168.1.100").
+      If no value is provided, the value `supervisor` will be used.
 
-      hass_url:
-        name: Home Assistant URL
-        description: >
-          The URL of your Home Assistant instance (e.g., "http://homeassistant:8123" or "http://192.168.1.100:8123").
-          If no value is provided, the value `http://supervisor/core` will be used.
+  hass_url:
+    name: Home Assistant URL
+    description: >
+      The URL of your Home Assistant instance (e.g., "http://homeassistant:8123" or "http://192.168.1.100:8123").
+      If no value is provided, the value `http://supervisor/core` will be used.
 
-      hass_token:
-        name: Home Assistant Token
-        description: >
-          The long-lived access token for your Home Assistant instance. 
-          If no value is provided, the contents of the environment variable `SUPERVISOR_TOKEN` will be used.
+  hass_token:
+    name: Home Assistant Token
+    description: >
+      The long-lived access token for your Home Assistant instance. 
+      If no value is provided, the contents of the environment variable `SUPERVISOR_TOKEN` will be used.
   
   extra_args:
     name: Extra Jupyter Arguments
