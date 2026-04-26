@@ -23,6 +23,11 @@ hassio_api: true
 ports:
   8888/tcp: 8888
 
+ports_description:
+  8888/tcp: "JupyterLab web interface"
+
+webui: "http://[HOST]:[PORT:8888]"
+
 environment:
   JUPYTER_CONFIG_DIR: "/data/.jupyter"
   PYTHONPATH: "/opt/typehints:/config/pyscript/modules"
