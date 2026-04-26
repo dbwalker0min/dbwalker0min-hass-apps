@@ -1,0 +1,137 @@
+name: CI validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+jobs:
+  validate-yaml:
+    name: Validate YAML files
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Lint YAML files
+        run: yamllint --config-file .yamllint.yml .
+
+  validate-addon-structure:
+    name: Validate add-on structure
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Check required add-on files
+        shell: bash
+        run: |
+          found=0
+          for addon_dir in */; do
+            if [ -f "${addon_dir}config.yaml" ]; then
+              found=1
+              echo "Checking add-on: ${addon_dir}"
+              missing=0
+              for required in Dockerfile CHANGELOG.md README.md; do
+                if [ ! -f "${addon_dir}${required}" ]; then
+                  echo "  ERROR: Missing required file: ${addon_dir}${required}"
+                  missing=1
+                fi
+              done
+              if [ "$missing" -eq 0 ]; then
+                echo "  OK"
+              else
+                exit 1
+              fi
+            fi
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "WARNING: No add-on directories found (no subdirectory with config.yaml)"
+          fi
+
+  version-consistency:
+    name: Check version consistency
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Check version consistency
+        shell: bash
+        run: |
+          exit_code=0
+          for addon_dir in */; do
+            if [ -f "${addon_dir}config.yaml" ]; then
+              echo "Checking version consistency for: ${addon_dir}"
+
+              config_version=$(grep -m1 '^version:' "${addon_dir}config.yaml" \
+                | awk '{print $2}' | tr -d '"')
+              echo "  config.yaml version: ${config_version}"
+
+              changelog_version=$(grep -m1 '^## [0-9]' "${addon_dir}CHANGELOG.md" \
+                | awk '{print $2}')
+              echo "  CHANGELOG.md latest release: ${changelog_version}"
+
+              if [ "${config_version}" != "${changelog_version}" ]; then
+                echo "  ERROR: Version mismatch —" \
+                  "config.yaml=${config_version}, CHANGELOG.md=${changelog_version}"
+                exit_code=1
+              else
+                echo "  OK (config matches changelog)"
+              fi
+
+              if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+                tag_version="${GITHUB_REF_NAME#v}"
+                echo "  Git tag version: ${tag_version}"
+                if [ "${config_version}" != "${tag_version}" ]; then
+                  echo "  ERROR: Tag ${GITHUB_REF_NAME} does not match" \
+                    "config.yaml version ${config_version} in ${addon_dir}"
+                  exit_code=1
+                else
+                  echo "  OK (config matches tag)"
+                fi
+              fi
+            fi
+          done
+          exit "$exit_code"
+
+  docker-build:
+    name: Test Docker build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - addon: jupyter_pyscript
+            image: ghcr.io/dbwalker0min/amd64-addon-jupyter_pyscript
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.addon }}
+          file: ./${{ matrix.addon }}/Dockerfile
+          platforms: linux/amd64
+          push: false
+          tags: ${{ matrix.image }}:ci-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
