@@ -56,14 +56,21 @@ At app startup:
    - `/opt/conda/share/jupyter/kernels/pyscript/pyscript.conf`
 4. Jupyter starts using `NOTEBOOK_ARGS`.
 
-## Install and run
+## Quick Start
 
-1. Add this repository to Home Assistant Add-on Store repositories:
-   - `https://github.com/dbwalker0min/dbwalker0min-hass-apps`
-2. Install **Jupyter + Pyscript**.
-3. Configure add-on options (minimum: verify `notebook_dir`).
-4. Start the add-on.
-5. Open Jupyter via port `8888` on your Home Assistant host.
+> **Supported architectures:** This add-on runs only on `amd64` and `aarch64` (arm64) hosts.
+
+1. Open **Settings → Add-ons → Add-on Store** in Home Assistant.
+2. Open the repository menu (the **⋮** icon in the top-right corner) and select **Repositories**.
+3. Click **Add** and enter the repository URL:
+   ```
+   https://github.com/dbwalker0min/dbwalker0min-hass-apps
+   ```
+4. Close the Repositories dialog and return to the Add-on Store. Scroll to the **dbwalker0min HA Apps** section.
+5. Click **Jupyter + PyScript** and then click **Install**.
+6. Once installed, open the **Configuration** tab to set required options (at minimum, `hass_host`, `hass_url`, and `hass_token`).
+7. Return to the **Info** tab and click **Start**.
+8. Open JupyterLab in your browser at `http://<home-assistant-host>:8888`.
 
 ## Development and releases
 
