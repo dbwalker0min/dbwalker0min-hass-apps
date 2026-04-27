@@ -8,13 +8,18 @@ All notable changes to this add-on are documented in this file.
 - 
 
 ### Changed
-- Removed nested `jupyter_auth` and `hass_auth` configuration groups; `jupyter_token`, `jupyter_password`, `hass_host`, `hass_url`, and `hass_token` are now top-level options.
+- 
 
 ### Fixed
 - 
 
 ### Security
 - 
+
+## 0.2.9 - 2026-04-27
+
+### Changed
+- Removed nested `jupyter_auth` and `hass_auth` configuration groups; `jupyter_token`, `jupyter_password`, `hass_host`, `hass_url`, and `hass_token` are now top-level options.
 
 ## 0.2.8 - 2026-03-15
 
