@@ -1,17 +1,25 @@
-# Home Assistant App: Jupyter + Pyscript
+# Home Assistant App: Jupyter + PyScript
 
-Run JupyterLab with a pyscript-capable kernel inside Home Assistant OS.
+Run JupyterLab inside Home Assistant OS with a PyScript-capable kernel for interactive automation development.
 
-This add-on is designed for interactive development under `/config/pyscript` and generates kernel-side `pyscript.conf` at startup so notebooks can call into Home Assistant. There is also a Jupyter extension to add an "HA" menu to regenerate Pyscript stubs and to reload the Home Assistant YAML configuration.
+This app is intended for interactive PyScript development, with notebooks and code living directly under `/config/pyscript`.
+
+It also includes a JupyterLab extension that adds an **HA** menu for common development actions, such as regenerating PyScript stubs and reloading Home Assistant YAML configuration.
+
+This setup provides an IDE-like experience for PyScript development inside Home Assistant. You can prototype and test ideas interactively in a Jupyter notebook, inspect state and services in real time, and then move working code directly into PyScript automations or apps.
+
+This short feedback loop makes it much easier to develop, debug, and iterate on Home Assistant automations compared to editing YAML or restarting components. It effectively turns Home Assistant into a live development environment for automation logic.
 
 ## Features
 
-- JupyterLab plus Pyscript kernel in one add-on.
-- JupyterLab extension for reloading YAML configuration and rebuilding Pyscript stubs.
-- Notebook root defaults to `/config/pyscript`.
-- Startup-generated `pyscript.conf` for kernel Home Assistant connectivity.
-- Configurable Jupyter auth (password or token).
-- Supports `amd64` and `aarch64`.
+- JupyterLab with a PyScript-capable kernel
+- JupyterLab extension for:
+  - Reloading YAML configuration
+  - Rebuilding PyScript stubs
+- Notebook root defaults to `/config/pyscript`
+- Startup-generated `pyscript.conf` for Home Assistant connectivity
+- Configurable Jupyter authentication (password or token)
+- Supports `amd64` and `aarch64`
 
 ## Configuration options
 
@@ -38,9 +46,7 @@ From `jupyter_pyscript/config.yaml`:
 - `extra_args` (optional string)
   - Additional Jupyter CLI arguments; parsed with shell-style quoting.
 
-### Jupyter authentication
-
-Jupyter supports several different levels of authentication. If a password is specified, then password protection will be used. If a token is provided, then it will be used. Otherwise, a random token will be generated and used.
+**Note:** `hass_url` and `hass_host` may appear redundant, but both are required by the Jupyter PyScript connector.
 
 ## Startup behavior
 
@@ -58,19 +64,19 @@ At app startup:
 
 ## Quick Start
 
-> **Supported architectures:** This add-on runs only on `amd64` and `aarch64` (arm64) hosts.
+> **Supported architectures:** This app runs only on `amd64` and `aarch64` (arm64) hosts.
 
-1. Open **Settings → Add-ons → Add-on Store** in Home Assistant.
+1. Open **Settings → Apps → App Store** in Home Assistant.
 2. Open the repository menu (the **⋮** icon in the top-right corner) and select **Repositories**.
 3. Click **Add** and enter the repository URL:
    ```
    https://github.com/dbwalker0min/dbwalker0min-hass-apps
    ```
-4. Close the Repositories dialog and return to the Add-on Store. Scroll to the **dbwalker0min HA Apps** section.
+4. Close the Repositories dialog and return to the App Store. Scroll to the **dbwalker0min HA Apps** section.
 5. Click **Jupyter + PyScript** and then click **Install**.
 6. Once installed, open the **Configuration** tab to set required options (at minimum, `hass_host`, `hass_url`, and `hass_token`).
 7. Return to the **Info** tab and click **Start**.
-8. Open JupyterLab in your browser at `http://<home-assistant-host>:8888`.
+8. Open JupyterLab from the app Web UI button, or browse to: `http://<home-assistant-host>:8888`.
 
 ## Development and releases
 
@@ -79,9 +85,13 @@ At app startup:
 
 ## Security notes
 
-- Do not commit long-lived secrets.
-- Prefer password or token auth for Jupyter.
-- Keep Home Assistant token scope minimal and rotate when needed.
+JupyterLab has broad access to your Home Assistant configuration and mounted files. Treat access to this app as highly privileged.
+
+- Use Jupyter password or token authentication.
+- Prefer access through a VPN, Tailscale, or Cloudflare Access if remote access is needed.
+- Do not commit long-lived Home Assistant tokens or other secrets.
+- Rotate Home Assistant long-lived access tokens periodically.
+- Jupyter on port `8888` is powerful. Do not expose it publicly without strong authentication, a VPN, or Cloudflare Access.
 
 ## License
 
