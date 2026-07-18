@@ -16,6 +16,11 @@ All notable changes to this add-on are documented in this file.
 ### Security
 - 
 
+## 0.2.10 - 2026-07-18
+
+### Added
+- Added `sqlite3` and `libsqlite3-dev` to the add-on image for SQLite CLI and build support.
+
 ## 0.2.9 - 2026-04-27
 
 ### Changed
