@@ -1,6 +1,4 @@
 #!/bin/bash
-set -euo pipefail
-
 user="${NB_USER:-jovyan}"
 persistent_home="/data/home/${user}"
 
