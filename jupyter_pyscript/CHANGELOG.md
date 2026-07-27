@@ -16,6 +16,15 @@ All notable changes to this add-on are documented in this file.
 ### Security
 - 
 
+## 0.2.11 - 2026-07-27
+
+### Added
+- Added pre-notebook hook (`10persistent-home.sh`) to persist the notebook user's home directory under `/data/home` across container restarts.
+
+### Changed
+- Updated Dockerfile base image tag to `2026-07-20`.
+- Updated `homeassistant-stubs` to `2026.2.3`.
+
 ## 0.2.10 - 2026-07-18
 
 ### Added
