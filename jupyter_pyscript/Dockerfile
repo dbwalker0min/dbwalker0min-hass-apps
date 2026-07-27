@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.6
-FROM quay.io/jupyter/minimal-notebook:python-3.11
+FROM quay.io/jupyter/minimal-notebook:2026-07-20
 
 USER root
 
