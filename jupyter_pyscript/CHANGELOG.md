@@ -16,7 +16,7 @@ All notable changes to this add-on are documented in this file.
 ### Security
 - 
 
-## 0.2.12-dev - 2026-07-27
+## 0.2.12 - 2026-07-27
 
 ### Added
 - Added `ruff` (linter/formatter) and `python-lsp-ruff` (LSP plugin) to the image for in-notebook linting and formatting via JupyterLab LSP.
