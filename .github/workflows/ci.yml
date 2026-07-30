@@ -135,3 +135,145 @@ jobs:
           tags: ${{ matrix.image }}:ci-test
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  prepare-release:
+    name: Prepare release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs:
+      - validate-yaml
+      - validate-addon-structure
+      - version-consistency
+      - docker-build
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      should_release: ${{ steps.release.outputs.should_release }}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine release version
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          versions=()
+          for addon_dir in */; do
+            if [ -f "${addon_dir}config.yaml" ]; then
+              version=$(grep -m1 '^version:' "${addon_dir}config.yaml" \
+                | awk '{print $2}' | tr -d '"')
+              if [ -z "${version}" ]; then
+                echo "ERROR: Could not determine version for ${addon_dir}" >&2
+                exit 1
+              fi
+              versions+=("${version}")
+            fi
+          done
+
+          if [ "${#versions[@]}" -eq 0 ]; then
+            echo "ERROR: No add-on versions found" >&2
+            exit 1
+          fi
+
+          mapfile -t unique_versions < <(printf '%s\n' "${versions[@]}" | sort -u)
+          if [ "${#unique_versions[@]}" -ne 1 ]; then
+            printf 'ERROR: Expected exactly one add-on version, found: %s\n' \
+              "${unique_versions[*]}" >&2
+            exit 1
+          fi
+
+          version="${unique_versions[0]}"
+          tag="v${version}"
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            echo "Release tag ${tag} already exists; skipping publish."
+          else
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+            echo "Release tag ${tag} is missing; publishing release."
+          fi
+
+  publish-release-images:
+    name: Publish release images
+    if: needs.prepare-release.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    needs:
+      - prepare-release
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            image: ghcr.io/dbwalker0min/amd64-addon-jupyter_pyscript
+          - platform: linux/arm64
+            image: ghcr.io/dbwalker0min/aarch64-addon-jupyter_pyscript
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./jupyter_pyscript
+          file: ./jupyter_pyscript/Dockerfile
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: ${{ matrix.image }}:${{ needs.prepare-release.outputs.version }},${{ matrix.image }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  create-release-tag:
+    name: Create release tag
+    if: needs.prepare-release.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    needs:
+      - prepare-release
+      - publish-release-images
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create tag
+        env:
+          VERSION: ${{ needs.prepare-release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v${VERSION}"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "Tag ${tag} already exists; nothing to do."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${tag}" -m "Release ${VERSION}"
+          git push origin "refs/tags/${tag}"
