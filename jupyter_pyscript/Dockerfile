@@ -25,5 +25,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && jupyter server extension list \
     && jupyter labextension list
 
+# npm w/ cache mount
+RUN --mount=type=cache,target=/root/.npm \
+    npm install -g yaml-language-server@1.24.0
+
 COPY --chmod=755 bin/before-notebook.d/*.sh /usr/local/bin/before-notebook.d/
 COPY --chmod=755 bin/* /usr/local/bin/
