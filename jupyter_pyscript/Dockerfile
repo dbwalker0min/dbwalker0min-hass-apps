@@ -27,15 +27,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # npm w/ cache mount
 RUN --mount=type=cache,target=/root/.npm \
-    npm install -g yaml-language-server@1.24.0 prettier
-
-# patch yaml-language-server: pre-seed HA custom tags so config changes are accepted
-# NOTE: this patch is tied to yaml-language-server@1.24.0; verify after upgrades
-RUN YLS="$(npm root -g)/yaml-language-server/out/server/src/yamlSettings.js" \
- && sed -i \
-      's/this\.customTags = \[\];/this.customTags = ["!input", "!secret"];/' \
-      "$YLS" \
- && grep -q 'this.customTags = \["!input", "!secret"\];' "$YLS"
+    npm install -g \
+      'github:dbwalker0min/yaml-language-server#8a81e5c5bd53b9469a130977bab08a88bd50e921' \
+      prettier
 
 COPY --chmod=755 bin/before-notebook.d/*.sh /usr/local/bin/before-notebook.d/
 COPY --chmod=755 bin/* /usr/local/bin/
