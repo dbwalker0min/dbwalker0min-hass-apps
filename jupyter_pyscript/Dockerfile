@@ -29,7 +29,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 RUN --mount=type=cache,target=/root/.npm \
     npm uninstall -g yaml-language-server || true \
     && rm -rf /usr/local/lib/node_modules/yaml-language-server \
-    && npm install -g \
+          /usr/local/lib/node_modules/.yaml-language-server-* \
+    && npm install -g --cache /root/.npm \
       'github:dbwalker0min/yaml-language-server#8a81e5c5bd53b9469a130977bab08a88bd50e921' \
       prettier
 
