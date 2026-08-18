@@ -7,7 +7,7 @@ USER root
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update \
- && apt-get install -y --no-install-recommends lnav sqlite3 libsqlite3-dev \
+ && apt-get install -y --no-install-recommends lnav sqlite3 libsqlite3-dev nodejs npm \
  && rm -rf /var/lib/apt/lists/*
 
 COPY requirements-*.txt /tmp/
@@ -24,6 +24,15 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && jupyter pyscript install \
     && jupyter server extension list \
     && jupyter labextension list
+
+# npm w/ cache mount
+RUN --mount=type=cache,target=/root/.npm \
+    npm uninstall -g yaml-language-server || true \
+    && rm -rf /usr/local/lib/node_modules/yaml-language-server \
+          /usr/local/lib/node_modules/.yaml-language-server-* \
+    && npm install -g --cache /root/.npm \
+      'github:dbwalker0min/yaml-language-server#8a81e5c5bd53b9469a130977bab08a88bd50e921' \
+      prettier
 
 COPY --chmod=755 bin/before-notebook.d/*.sh /usr/local/bin/before-notebook.d/
 COPY --chmod=755 bin/* /usr/local/bin/
