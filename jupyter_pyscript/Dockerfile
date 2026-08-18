@@ -31,7 +31,7 @@ RUN --mount=type=cache,target=/root/.npm \
     && rm -rf /usr/local/lib/node_modules/yaml-language-server \
           /usr/local/lib/node_modules/.yaml-language-server-* \
     && npm install -g --cache /root/.npm \
-      'github:dbwalker0min/yaml-language-server#8a81e5c5bd53b9469a130977bab08a88bd50e921' \
+      'github:dbwalker0min/yaml-language-server#30e727500a28ce3c3987450ada9c03f2c92ce2ef' \
       prettier
 
 COPY --chmod=755 bin/before-notebook.d/*.sh /usr/local/bin/before-notebook.d/
