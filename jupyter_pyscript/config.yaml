@@ -1,8 +1,8 @@
-name: "Jupyter + Pyscript"
-slug: "jupyter_pyscript"
+name: "Jupyter + Pyscript Test"
+slug: "jupyter_pyscript_test"
 description: "JupyterLab on HAOS with pyscript kernel; notebooks live in /config/pyscript; pyscript.conf generated from options"
-version: "0.2.12"
-image: "ghcr.io/dbwalker0min/{arch}-addon-jupyter_pyscript"
+version: "0.2.12-1"
+#image: "ghcr.io/dbwalker0min/{arch}-addon-jupyter_pyscript"
 arch:
   - amd64
   - aarch64
@@ -30,6 +30,7 @@ webui: "http://[HOST]:[PORT:8888]"
 
 environment:
   JUPYTER_CONFIG_DIR: "/data/.jupyter"
+  JUPYTER_RUNTIME_DIR: "/tmp/jupyter-runtime"
   PYTHONPATH: "/opt/typehints:/config/pyscript/modules"
   CHOWN_EXTRA: "/config/pyscript,/data"
   CHOWN_EXTRA_OPTS: "-R"
