@@ -28,19 +28,19 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 ARG YAML_LANGUAGE_SERVER_COMMIT=8a81e5c5bd53b9469a130977bab08a88bd50e921
 
 RUN --mount=type=cache,target=/root/.npm \
-    npm uninstall -g yaml-language-server || true \
-    && rm -rf /opt/yaml-language-server \
+    rm -rf /opt/yaml-language-server \
     && mkdir -p /opt/yaml-language-server \
     && npm install \
          --prefix /opt/yaml-language-server \
          --cache /root/.npm \
          "github:dbwalker0min/yaml-language-server#${YAML_LANGUAGE_SERVER_COMMIT}" \
+    && cd /opt/yaml-language-server/node_modules/yaml-language-server \
+    && npm run build \
     && rm -f /usr/local/bin/yaml-language-server \
     && ln -s \
          /opt/yaml-language-server/node_modules/.bin/yaml-language-server \
          /usr/local/bin/yaml-language-server \
     && npm install -g --cache /root/.npm prettier \
     && yaml-language-server --version
-
 COPY --chmod=755 bin/before-notebook.d/*.sh /usr/local/bin/before-notebook.d/
 COPY --chmod=755 bin/* /usr/local/bin/

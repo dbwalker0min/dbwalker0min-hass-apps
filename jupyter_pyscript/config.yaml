@@ -1,7 +1,7 @@
 name: "Jupyter + Pyscript Test"
 slug: "jupyter_pyscript_test"
 description: "JupyterLab on HAOS with pyscript kernel; notebooks live in /config/pyscript; pyscript.conf generated from options"
-version: "0.2.12-1"
+version: "0.2.12-2"
 #image: "ghcr.io/dbwalker0min/{arch}-addon-jupyter_pyscript"
 arch:
   - amd64
