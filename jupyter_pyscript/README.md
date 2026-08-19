@@ -21,6 +21,14 @@ This short feedback loop makes it much easier to develop, debug, and iterate on 
 - Configurable Jupyter authentication (password or token)
 - Supports `amd64` and `aarch64`
 
+## Status
+
+This is an early preview release to gauge community interest.
+
+The core functionality is stable and already useful for interactive PyScript development, but the add-on is still evolving. If there’s interest, I plan to continue refining the workflow and expanding features.
+
+Feedback and real-world usage are especially valuable at this stage.
+
 ## Configuration options
 
 From `jupyter_pyscript/config.yaml`:
