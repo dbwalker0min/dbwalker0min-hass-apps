@@ -16,6 +16,13 @@ All notable changes to this add-on are documented in this file.
 ### Security
 - 
 
+## 0.2.13 - 2026-08-18
+
+### Added
+
+- Added fixed build of yaml-language-server.
+- Added the program `prettier`
+
 ## 0.2.12 - 2026-07-27
 
 ### Added
