@@ -40,3 +40,9 @@ jobs:
           docker run --rm --entrypoint python
           -v "${{ github.workspace }}/fittrackee/tests:/tests:ro"
           fittrackee-ha:test /tests/test_configuration.py
+      - name: Test live runner safety without credentials or network
+        run: >-
+          docker run --rm --entrypoint python
+          -v "${{ github.workspace }}/fittrackee/tests:/tests:ro"
+          -v "${{ github.workspace }}/fittrackee/tools:/tools:ro"
+          fittrackee-ha:test /tests/test_live_runner.py
