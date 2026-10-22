@@ -45,6 +45,6 @@ Each run writes an ignored `.test-results/RUN-ID.json` report/checkpoint. A fail
 
 ## Known upstream privacy behavior
 
-On installed FitTrackee 1.3.6, the test image URL is retrievable without a session, despite the activity/media gallery visibility being private. The app uses unguessable media filenames; possessing a URL permits access. This behavior is visible in upstream `fittrackee/media/routes.py` (`get_media`) and was reproduced using only the generated checkerboard. Do not treat gallery visibility as authenticated protection of the underlying image URL. Investigate this before importing personal photographs; this tooling does not change upstream authorization.
+On installed FitTrackee 1.3.6, the test image URL is retrievable without a session, despite the activity/media gallery visibility being private. The app uses unguessable media filenames; possessing a URL permits access. This behavior is visible in upstream `fittrackee/media/routes.py` (`get_media`) and was reproduced using only the generated checkerboard. Do not treat gallery visibility as authenticated protection of the underlying image URL. On 2026-10-22 the user accepted this limitation for the family installation. It does not block photo testing or imports. The runner reports it as informational; no authorization change or additional access layer is requested.
 
 No personal photograph is required. No Strava archive is imported. Live test credentials are not sent to GitHub Actions: CI runs only the offline safety tests, not the live sandbox test.

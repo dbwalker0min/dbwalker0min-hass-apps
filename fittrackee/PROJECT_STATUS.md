@@ -45,7 +45,7 @@ Original WSL repository /home/dbwal/fittrackee, runtime, account, .env and backu
 
 ## Remaining before production
 1. PR #30 is merged and both architecture CI builds passed. Use the custom repository for future installs/updates and test on the N100 HAOS server; AMD64 container testing alone is not AMD64 Supervisor verification.
-2. Generated photo attachment, description and thumbnail tests now pass in the dedicated test account. Test photo persistence after app restart and a scoped backup/restore using a retained checkpoint; test queued archive tasks and realistic resource use. Investigate unauthenticated media URL access before personal photo imports.
+2. Generated photo attachment, description and thumbnail tests now pass in the dedicated test account. Test photo persistence after app restart and a scoped backup/restore using a retained checkpoint; test queued archive tasks and realistic resource use. Photo-link access is an accepted limitation for this family installation and does not block personal photo imports.
 3. Make a protected off-device copy of HA backups and verify recovery on a spare target before trusting a full archive. Cross-architecture database moves require logical dump/restore, not assumed portability of a PostgreSQL directory.
 4. Choose production target/cutover timing and any distinct sandbox hostname; current public URL points to this sandbox app. No production instance or NPM certificate was replaced.
 5. Examine the actual Strava export structure before designing a separate resumable, duplicate-safe Python API importer for recordings, metadata and photos. Do not implement direct database imports.
@@ -65,3 +65,9 @@ Retained UI fixture: Automated attachment check 5ba8ee8a, checkpoint .test-resul
 Finding: actual anonymous HTTPS access to a generated photo URL succeeds on upstream FitTrackee 1.3.6. Private media/gallery visibility does not authenticate the static media URL (upstream media/routes.py get_media). Tests use generated images only and report this limitation; no authorization changes were made. Do not assume personal photographs are access-controlled solely by gallery visibility.
 
 No app restart or backup/restore was performed in this tooling session. Use a retained run plus verify for those explicitly scheduled persistence tests; those operations affect the whole app, not only the test account. The installed app remains version 0.1.1.
+
+## Accepted decision: photo-link access — 2026-10-22
+
+The user explicitly accepts FitTrackee 1.3.6 serving an image without login to anyone who can reach the server and knows its exact randomly generated URL. Private gallery visibility does not make the underlying media URL require authentication. This is an upstream application behavior, not a TLS/Nginx Proxy Manager fault.
+
+For this installation used by the user and spouse, retain the existing behavior. It is not a blocker for photo testing, personal photo imports, or the family deployment. No application authorization patch, additional proxy login, or VPN requirement is requested. Keep the observation in test reports as an informational known limitation, not a failing acceptance condition. Do not repeatedly request approval or propose remediation unless the user revisits the decision or the exposure materially changes. Secure cookies, TLS and existing proxy restrictions remain unchanged.
