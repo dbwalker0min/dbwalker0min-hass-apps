@@ -37,3 +37,7 @@ Run JupyterLab and a pyscript-capable kernel in Home Assistant OS.
 ## License
 
 See `LICENSE`.
+
+## FitTrackee (experimental)
+
+Self-contained activity tracking with PostgreSQL/PostGIS, Redis and background workers for aarch64 and amd64. See [fittrackee/README.md](fittrackee/README.md) and [fittrackee/PROJECT_STATUS.md](fittrackee/PROJECT_STATUS.md). Uses Nginx Proxy Manager for HTTPS and Supervisor cold backups. Versions are independent of Jupyter + Pyscript.

@@ -1,0 +1,42 @@
+name: FitTrackee app validation
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'fittrackee/**'
+      - '.github/workflows/fittrackee.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'fittrackee/**'
+      - '.github/workflows/fittrackee.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux/amd64
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./fittrackee
+          platforms: ${{ matrix.platform }}
+          load: true
+          push: false
+          tags: fittrackee-ha:test
+          cache-from: type=gha,scope=fittrackee-${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=fittrackee-${{ matrix.platform }}
+      - name: Test security configuration
+        run: >-
+          docker run --rm --entrypoint python
+          -v "${{ github.workspace }}/fittrackee/tests:/tests:ro"
+          fittrackee-ha:test /tests/test_configuration.py

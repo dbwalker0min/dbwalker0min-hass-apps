@@ -1,0 +1,13 @@
+.git
+__pycache__
+*.pyc
+tests
+legacy
+PROJECT_STATUS.md
+AGENTS.md
+
+.env*
+options.json
+.secrets
+data
+backups

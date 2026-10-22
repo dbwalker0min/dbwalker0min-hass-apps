@@ -1,0 +1,28 @@
+name: FitTrackee
+slug: fittrackee
+version: "0.1.1"
+description: "Activity tracker with PostgreSQL/PostGIS and background workers"
+url: "https://github.com/dbwalker0min/dbwalker0min-hass-apps/tree/main/fittrackee"
+arch:
+  - aarch64
+  - amd64
+stage: experimental
+startup: application
+boot: auto
+init: false
+timeout: 120
+backup: cold
+ports:
+  8080/tcp: null
+ports_description:
+  8080/tcp: "HTTP for trusted Nginx Proxy Manager only; never forward publicly"
+watchdog: "http://[HOST]:[PORT:8080]/healthz"
+options:
+  external_url: "https://fittrackee.dbwalker0min.info"
+  trusted_proxy_ips: []
+  workers: 1
+schema:
+  external_url: url
+  trusted_proxy_ips:
+    - str
+  workers: int(1,2)
