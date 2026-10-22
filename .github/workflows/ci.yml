@@ -118,6 +118,8 @@ jobs:
         include:
           - addon: jupyter_pyscript
             image: ghcr.io/dbwalker0min/amd64-addon-jupyter_pyscript
+          - addon: fittrackee
+            image: ghcr.io/dbwalker0min/amd64-addon-fittrackee
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
