@@ -46,3 +46,8 @@ jobs:
           -v "${{ github.workspace }}/fittrackee/tests:/tests:ro"
           -v "${{ github.workspace }}/fittrackee/tools:/tools:ro"
           fittrackee-ha:test /tests/test_live_runner.py
+      - name: Test Strava importer offline
+        run: >-
+          docker run --rm --network none --entrypoint python
+          -v "${{ github.workspace }}/fittrackee/importer:/importer:ro"
+          fittrackee-ha:test -m unittest discover -s /importer/tests -v

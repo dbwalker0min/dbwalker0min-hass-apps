@@ -3,7 +3,7 @@
 Updated: 2026-10-22 (America/Los_Angeles)
 
 ## Current result
-FitTrackee 1.3.6 is running as Home Assistant app 0.1.1 on the sandbox Raspberry Pi 5. Real HTTPS login, activity upload, restart/update persistence, and a scoped Supervisor cold backup/restore have passed. No Strava importer is implemented.
+FitTrackee 1.3.6 is running as Home Assistant app 0.1.1 on the sandbox Raspberry Pi 5. Real HTTPS login, activity upload, restart/update persistence, and a scoped Supervisor cold backup/restore have passed. A separate bounded Strava API importer is implemented; no actual export activities have been uploaded.
 
 Active source: C:\Users\dbwal\VSCode\HomeAssistant\dbwalker0min-hass-apps\fittrackee
 Repository: https://github.com/dbwalker0min/dbwalker0min-hass-apps
@@ -48,7 +48,7 @@ Original WSL repository /home/dbwal/fittrackee, runtime, account, .env and backu
 2. Generated photo attachment, description and thumbnail tests now pass in the dedicated test account. Test photo persistence after app restart and a scoped backup/restore using a retained checkpoint; test queued archive tasks and realistic resource use. Photo-link access is an accepted limitation for this family installation and does not block personal photo imports.
 3. Make a protected off-device copy of HA backups and verify recovery on a spare target before trusting a full archive. Cross-architecture database moves require logical dump/restore, not assumed portability of a PostgreSQL directory.
 4. Choose production target/cutover timing and any distinct sandbox hostname; current public URL points to this sandbox app. No production instance or NPM certificate was replaced.
-5. Examine the actual Strava export structure before designing a separate resumable, duplicate-safe Python API importer for recordings, metadata and photos. Do not implement direct database imports.
+5. Review a one-ride real-export pilot in the dedicated test account, then validate recording metrics/sensors and photographs before broader import. The offline five-ride plan is a preview only. Decide how E-Bike Ride maps to the available electric-road/electric-mountain sports before selecting those activities. No direct database imports.
 
 Maintain this file after meaningful changes. The owner deleted the earlier synthetic ride. New tests recreate their own fixtures in a dedicated account; cleanup is restricted to exact per-run IDs. Do not print credentials, Supervisor tokens, private runtime environment, or generated app secrets. Operations and scoped restore commands are in SANDBOX.md.
 
@@ -71,3 +71,17 @@ No app restart or backup/restore was performed in this tooling session. Use a re
 The user explicitly accepts FitTrackee 1.3.6 serving an image without login to anyone who can reach the server and knows its exact randomly generated URL. Private gallery visibility does not make the underlying media URL require authentication. This is an upstream application behavior, not a TLS/Nginx Proxy Manager fault.
 
 For this installation used by the user and spouse, retain the existing behavior. It is not a blocker for photo testing, personal photo imports, or the family deployment. No application authorization patch, additional proxy login, or VPN requirement is requested. Keep the observation in test reports as an informational known limitation, not a failing acceptance condition. Do not repeatedly request approval or propose remediation unless the user revisits the decision or the exposure materially changes. Secure cookies, TLS and existing proxy restrictions remain unchanged.
+
+## Strava importer — 2026-10-22
+
+Implemented on fittrackee-strava-import, based on repeatable-test PR #31. See importer/README.md for commands, preservation limits and recovery procedures. Python 3.10+ standard library; no app deployment change or direct database access. Inspect, plan and apply without --execute make zero network requests. Execution requires explicit target-account confirmation, protected credentials and a persistent journal; default one activity, hard maximum 20 per batch.
+
+Private example archive: personal/strava-export.zip, about 422 MiB. Offline inspection found 3,064 activity rows, 3,045 recording references and 19 activities without recordings. Recording formats: 1,896 FIT, 829 GPX, 315 TCX and five unsupported BIN. There are 2,533 Ride and 286 E-Bike Ride rows. Duplicate CSV column names are preserved rather than overwritten. Unrelated profile/contact/login export files are not read.
+
+Photo mapping uses only explicit activity references and media.csv captions. Found 22 missing referenced media files; 75 nonempty Media fields contain separators without usable paths. Missing files, video references and ambiguous sport mappings are reported; relationships are not guessed. Full selected CSV metadata remains in private plans; original recordings are uploaded without conversion after gzip decoding. FitTrackee calculates metrics from recording contents, so CSV totals are retained for review rather than forced into server metrics.
+
+Ignored offline artifacts: personal/strava-inventory.json and personal/pilot-plan.json. The reviewed-preview candidate plan contains five Ride activities, 12 linked photos and one warning, spanning FIT, TCX and GPX. Its archive and payload hashes passed an offline apply validation. It has NOT been executed. All real export activities/photos remain unimported. Keep the ZIP, plans and journals private when moving machines; do not commit them. personal/ and importer/ are excluded from the app Docker context.
+
+Validation: 20 offline tests pass. A separate tiny fictional export was imported through real HTTPS into fittrackee_test: one synthetic GPX ride, one generated checkerboard image, title/private note/source marker/caption/private visibility verified. Repeating with the same journal skipped it; a fresh journal reconciled the remote marker without another workout or photo upload. This retained synthetic fixture is titled Synthetic Strava importer verification; its ignored plans/journals have synthetic- prefixes under personal/. No actual FIT/TCX pilot, bulk import, app restart or backup/restore was performed in this session. Existing accepted photo-link behavior remains informational.
+
+Resume uses account-scoped journals plus exact [strava:ID] private-note markers. Uncertain POST outcomes stop for review instead of automatic retry. Previously imported activities without these markers need separate reconciliation. One journal per account, no concurrent independent importers; the upstream API has no atomic source-ID uniqueness constraint. No automatic rollback, deletion or recreation of deliberately deleted completed activities.

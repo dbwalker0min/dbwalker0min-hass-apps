@@ -32,7 +32,7 @@ Register through HTTPS. When shell/container administration is available, suppor
 
 Build from this folder using `docker build -t fittrackee-ha:test .`. Local Docker is optional development tooling, not a runtime dependency. Use named Docker volumes for `/data` in local lifecycle tests. Never point a development container at the preserved legacy data.
 
-Read [PROJECT_STATUS.md](PROJECT_STATUS.md) and [AGENTS.md](AGENTS.md). `legacy/` preserves the previous deployment source and docs for reference; it is excluded from the image. The original WSL repository, credentials and data remain untouched. No Strava importer is implemented; the future API utility stays separate from the HA app image.
+Read [PROJECT_STATUS.md](PROJECT_STATUS.md) and [AGENTS.md](AGENTS.md). `legacy/` preserves the previous deployment source and docs for reference; it is excluded from the image. The original WSL repository, credentials and data remain untouched. The separate [Strava importer](importer/README.md) inspects ZIP exports offline, prepares bounded review plans and imports explicitly selected activities through HTTPS. It stays outside the HA app image.
 
 Current sandbox details and safe scoped commands: [SANDBOX.md](SANDBOX.md).
 
