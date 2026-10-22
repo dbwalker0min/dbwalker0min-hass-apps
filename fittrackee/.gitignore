@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+options.json
+.secrets/
+data/
+backups/
+__pycache__/
+*.pyc
