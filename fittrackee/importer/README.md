@@ -14,7 +14,7 @@ Several activity CSV headers repeat. Both copies are retained (for example Dista
 
 ## Offline first
 
-Run from the Windows repository root:
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run from the Windows repository root. The wrapper uses the committed pyproject.toml, Python version and uv.lock to create/update importer/.venv automatically; no manual activation or Codex-bundled Python is needed:
 
 ```powershell
 .\fittrackee\importer\Import-Strava.ps1 inspect .\fittrackee\personal\strava-export.zip --report .\fittrackee\personal\strava-inventory.json
@@ -29,7 +29,14 @@ Inspect the private pilot-plan.json locally before execution: it contains actual
 
 By default only Strava Ride maps to Cycling (Sport), sport 1. The example also contains 286 E-Bike Ride activities; these are left out until you explicitly choose an appropriate sport mapping. FitTrackee's electric option is Mountain Biking (Electric), which may not describe road cycling. A JSON --sport-map can specify a chosen mapping, and repeatable --type selects activity types. Unsupported activities, BIN files and no-file/manual activities remain in the original export for a later supported import path.
 
-Mac/Linux: replace the PowerShell wrapper with python3 fittrackee/importer/strava_import.py. Set FITTRACKEE_PYTHON on Windows if you want a specific Python 3.10+ executable. The wrapper prefers the available bundled Python; it does not require Docker Desktop.
+The equivalent cross-platform command from the repository root is:
+
+```sh
+uv run --locked --project fittrackee/importer python fittrackee/importer/strava_import.py --help
+uv run --locked --project fittrackee/importer python -m unittest discover -s fittrackee/importer/tests -v
+```
+
+The project pins Python 3.13 for development while the utility supports Python 3.10+. uv can provision the interpreter. Commit uv.lock and .python-version; keep .venv local. Standard-library-only currently means no third-party dependencies; future dependencies belong in this uv project.
 
 ## Explicit pilot execution — not yet performed on real data
 
@@ -70,3 +77,9 @@ Offline synthetic tests cover repeated headers, Unicode, gzip expansion limits, 
 An actual FIT/TCX export pilot and its metrics/sensors/photo review remain to be approved. Do not equate a parsed plan or synthetic GPX test with validating thousands of real recordings.
 
 All export ZIPs, plans, inventories, journals and private test artifacts stay under ignored personal/. That directory is also excluded from Docker contexts. The original archive and your existing ignore rule are preserved. No personal data enters GitHub/CI; tests create small fictional archives in temporary directories.
+
+## Finding the generated test photograph
+
+Log in as fittrackee_test and open **Synthetic Strava importer verification**, dated October 21, 2026. Its direct activity page is https://fittrackee.dbwalker0min.info/workouts/F3PhMai3ubFbnVh2DUvzGT#photos . The generated checkerboard is an attachment on that workout; it is not a real photograph from your export. The earlier attachment runner also retained Automated attachment check 5ba8ee8a. The dashboard/calendar may not display the photo directly; open the workout detail and scroll to Photos, or use the #photos link above.
+
+Follow-up verification: a read-only check on the Pi confirmed both retained workouts still have one linked image, and each full image and thumbnail exists. Browser rendering could not be rechecked because the public hostname returned TLS unrecognized_name at that time; do not treat file existence as visual confirmation.

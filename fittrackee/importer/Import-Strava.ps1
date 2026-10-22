@@ -1,12 +1,7 @@
-# Pass through the Python CLI arguments without executing them as shell text.
+# uv manages the importer environment; caller-relative data paths stay unchanged.
 $ErrorActionPreference = 'Stop'
-$runnerPython = $env:FITTRACKEE_PYTHON
-if (-not $runnerPython) {
-    $bundledPython = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
-    if (Test-Path -LiteralPath $bundledPython) { $runnerPython = $bundledPython }
-    else { $runnerPython = 'python3' }
+if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+    throw 'Install uv first: https://docs.astral.sh/uv/getting-started/installation/'
 }
-& $runnerPython -c 'import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)'
-if ($LASTEXITCODE -ne 0) { throw 'Python 3.10+ required. Set FITTRACKEE_PYTHON to its executable path.' }
-& $runnerPython (Join-Path $PSScriptRoot 'strava_import.py') @args
+& uv run --locked --project $PSScriptRoot python (Join-Path $PSScriptRoot 'strava_import.py') @args
 exit $LASTEXITCODE

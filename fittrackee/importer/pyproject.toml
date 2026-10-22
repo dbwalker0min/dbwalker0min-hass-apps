@@ -1,0 +1,9 @@
+[project]
+name = "fittrackee-strava-importer"
+version = "0.1.0"
+description = "Bounded Strava export importer using the FitTrackee API"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.uv]
+package = false
