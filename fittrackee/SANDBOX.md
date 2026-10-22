@@ -22,7 +22,7 @@ NPM is on the other HA server (`ha.home`, 192.168.1.10). Its already configured 
 Actual options are managed by Supervisor, not committed as a credentials file:
 
 ```yaml
-external_url: https://fittrackee.dbwalker0min.info
+external_url: https://fittrackee-test.dbwalker0min.info
 trusted_proxy_ips:
   - 192.168.1.10
 workers: 1

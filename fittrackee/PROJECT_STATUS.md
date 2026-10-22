@@ -14,7 +14,7 @@ Read AGENTS.md, README.md, ARCHITECTURE.md and SANDBOX.md here before continuing
 - Sandbox SSH alias: ha-test; configured existing hassio user/key. Host ha-test.home / 192.168.99.10.
 - Actual platform: HAOS 18.3, Supervisor 2026.10.3, HA Core 2026.10.1, raspberrypi5-64, aarch64.
 - Supervisor app slug: local_fittrackee, installed from /addons/fittrackee. Version 0.1.1, auto boot and health watchdog enabled.
-- Public URL: https://fittrackee.dbwalker0min.info. Existing NPM on ha.home / 192.168.1.10 terminates TLS using its existing certificate.
+- Sandbox public URL: https://fittrackee-test.dbwalker0min.info. Production will use https://fittrackee.dbwalker0min.info. Existing NPM on ha.home / 192.168.1.10 terminates TLS using its existing certificate.
 - NPM route points to sandbox 192.168.99.10:3001. App 8080 maps to 3001. Port 3000 belongs to Z-Wave JS UI; it was not changed.
 - Proxy gate trusts only 192.168.1.10, verified in actual access logs. Requires HTTPS forwarding header, replaces Host/forwarded headers, and proxies to loopback Gunicorn. Secure cookies remain enabled. No certificate management in the app.
 - PostgreSQL, Redis and Gunicorn bind to loopback, never published. Only restricted HTTP gate has a host mapping. No router/firewall changes made.
@@ -91,3 +91,9 @@ Resume uses account-scoped journals plus exact [strava:ID] private-note markers.
 The importer now has pyproject.toml, committed uv.lock and .python-version (3.13), and a local ignored .venv. Import-Strava.ps1 delegates to uv run --locked; the former Codex-bundled Python fallback is removed. Cross-platform uv invocation is documented in importer/README.md. All 20 offline tests passed inside the uv environment; launcher --help also passed. No real archive imports occurred.
 
 User reported not noticing the test image. Read-only inspection on the Pi confirmed both retained synthetic workouts each have one linked media record and existing full-image/thumbnail files. The importer fixture direct Photos section is https://fittrackee.dbwalker0min.info/workouts/F3PhMai3ubFbnVh2DUvzGT#photos . The upstream UI places attachments in Photos and links card thumbnails to #photos. Current HTTPS browser and API probes returned TLS unrecognized_name; SSH still works. No proxy/TLS settings were changed. Visual rendering remains unverified in this follow-up; persisted files/links alone do not prove the browser displays them.
+
+## Sandbox hostname correction and image verification — 2026-10-22
+
+The NPM hostname had changed but Supervisor external_url still used the production hostname, causing the API to generate broken image URLs. Updated only the sandbox app external_url to https://fittrackee-test.dbwalker0min.info through Supervisor and restarted the app. Login and the retained synthetic workout API now succeed at the sandbox origin; returned full-image and thumbnail URLs both use that origin, return HTTP 200 and contain valid PNG data. Browser screenshot visually confirmed the blue/yellow checkerboard renders at its generated URL. No images were reuploaded. Actual media storage is /data/files/uploads/media/<user ID>/ (test user 2), including thumbnails; the earlier /data/files/media advice omitted uploads.
+
+Updated local protected test credentials base_url and sandbox/importer documentation. Production remains https://fittrackee.dbwalker0min.info, configurable via external_url; the app default is unchanged. Historical journals/checkpoints may still name the former origin; do not silently rewrite account-scoping guards. Use a new private journal against the sandbox origin if resuming the synthetic pilot, allowing remote marker reconciliation; no real export plan has been executed.

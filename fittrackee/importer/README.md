@@ -80,6 +80,6 @@ All export ZIPs, plans, inventories, journals and private test artifacts stay un
 
 ## Finding the generated test photograph
 
-Log in as fittrackee_test and open **Synthetic Strava importer verification**, dated October 21, 2026. Its direct activity page is https://fittrackee.dbwalker0min.info/workouts/F3PhMai3ubFbnVh2DUvzGT#photos . The generated checkerboard is an attachment on that workout; it is not a real photograph from your export. The earlier attachment runner also retained Automated attachment check 5ba8ee8a. The dashboard/calendar may not display the photo directly; open the workout detail and scroll to Photos, or use the #photos link above.
+Log in as fittrackee_test and open **Synthetic Strava importer verification**, dated October 21, 2026. Its direct activity page is https://fittrackee-test.dbwalker0min.info/workouts/F3PhMai3ubFbnVh2DUvzGT#photos . The generated checkerboard is an attachment on that workout; it is not a real photograph from your export. The earlier attachment runner also retained Automated attachment check 5ba8ee8a. The dashboard/calendar may not display the photo directly; open the workout detail and scroll to Photos, or use the #photos link above.
 
 Follow-up verification: a read-only check on the Pi confirmed both retained workouts still have one linked image, and each full image and thumbnail exists. Browser rendering could not be rechecked because the public hostname returned TLS unrecognized_name at that time; do not treat file existence as visual confirmation.
