@@ -27,4 +27,3 @@ Use official installation guidance and production Compose, not the retired docke
 
 ## Handoff
 Maintain PROJECT_STATUS.md after each meaningful change. It must record actual verification, remaining work, deployment location and versions without secrets. See docs/operations.md for operational commands. Deployment configuration now exists; use docker compose config --quiet before changes.
-

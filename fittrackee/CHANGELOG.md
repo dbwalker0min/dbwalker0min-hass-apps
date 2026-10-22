@@ -11,4 +11,3 @@
 - Require HTTPS origin and explicit reverse proxy IPs; retain secure cookies.
 - Add ordered shutdown, health checks and Supervisor cold-backup configuration.
 - Preserve the previous standalone deployment as legacy reference.
-

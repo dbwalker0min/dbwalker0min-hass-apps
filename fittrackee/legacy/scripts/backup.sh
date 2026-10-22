@@ -15,4 +15,3 @@ cp compose.yaml "$backup_dir/compose.yaml"
 cp .env "$backup_dir/.env"
 sha256sum "$backup_dir/database.dump" "$backup_dir/files.tar.gz" > "$backup_dir/SHA256SUMS"
 echo "Backup created: $backup_dir (contains secrets and personal data)"
-

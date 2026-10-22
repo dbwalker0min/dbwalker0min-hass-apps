@@ -32,4 +32,3 @@ with request('/api/auth/profile', headers={'Cookie': cookie}) as response:
     profile = json.load(response)
     assert profile['data']['username'] == 'ha_smoke'
 print('Trusted proxy, HTTPS scheme enforcement, Secure/HttpOnly cookies and authenticated profile passed')
-

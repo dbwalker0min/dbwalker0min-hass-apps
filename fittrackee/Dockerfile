@@ -13,4 +13,3 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
     CMD python /opt/ha-fittrackee/healthcheck.py
 ENTRYPOINT ["/sbin/tini", "-g", "--"]
 CMD ["python", "/opt/ha-fittrackee/launcher.py"]
-
