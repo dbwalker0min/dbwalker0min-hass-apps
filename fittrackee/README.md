@@ -35,3 +35,5 @@ Build from this folder using `docker build -t fittrackee-ha:test .`. Local Docke
 Read [PROJECT_STATUS.md](PROJECT_STATUS.md) and [AGENTS.md](AGENTS.md). `legacy/` preserves the previous deployment source and docs for reference; it is excluded from the image. The original WSL repository, credentials and data remain untouched. No Strava importer is implemented; the future API utility stays separate from the HA app image.
 
 Current sandbox details and safe scoped commands: [SANDBOX.md](SANDBOX.md).
+
+Repeatable attachment tests use a separate non-admin account: [tests/LIVE_TESTS.md](tests/LIVE_TESTS.md).

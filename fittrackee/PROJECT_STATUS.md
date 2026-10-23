@@ -1,13 +1,13 @@
 # Project status — FitTrackee Home Assistant app
 
-Updated: 2026-10-21 (America/Los_Angeles)
+Updated: 2026-10-22 (America/Los_Angeles)
 
 ## Current result
 FitTrackee 1.3.6 is running as Home Assistant app 0.1.1 on the sandbox Raspberry Pi 5. Real HTTPS login, activity upload, restart/update persistence, and a scoped Supervisor cold backup/restore have passed. No Strava importer is implemented.
 
 Active source: C:\Users\dbwal\VSCode\HomeAssistant\dbwalker0min-hass-apps\fittrackee
 Repository: https://github.com/dbwalker0min/dbwalker0min-hass-apps
-Review branch: fittrackee-ha-app. Main remains unchanged pending review.
+PR #30 is merged. Repeatable test tooling is developed on fittrackee-repeatable-tests.
 Read AGENTS.md, README.md, ARCHITECTURE.md and SANDBOX.md here before continuing.
 
 ## Runtime and network
@@ -44,10 +44,30 @@ Read AGENTS.md, README.md, ARCHITECTURE.md and SANDBOX.md here before continuing
 Original WSL repository /home/dbwal/fittrackee, runtime, account, .env and backups were not deleted or moved. It is historical, not a dependency of the Pi deployment. Non-secret source/docs from its last prior commit f739a4c are copied under legacy/ (excluded from image). The old WSL status/instructions point here. No original personal activity data existed there to migrate.
 
 ## Remaining before production
-1. Review/merge the GitHub changes and use the custom repository for future installs/updates. Validate both architecture CI jobs and test on the N100 HAOS server; AMD64 container testing alone is not AMD64 Supervisor verification.
-2. Test a photograph attachment and its backup/restore; test a queued archive task and realistic Pi storage/resource use. Existing original GPX/account restoration has passed.
+1. PR #30 is merged and both architecture CI builds passed. Use the custom repository for future installs/updates and test on the N100 HAOS server; AMD64 container testing alone is not AMD64 Supervisor verification.
+2. Generated photo attachment, description and thumbnail tests now pass in the dedicated test account. Test photo persistence after app restart and a scoped backup/restore using a retained checkpoint; test queued archive tasks and realistic resource use. Photo-link access is an accepted limitation for this family installation and does not block personal photo imports.
 3. Make a protected off-device copy of HA backups and verify recovery on a spare target before trusting a full archive. Cross-architecture database moves require logical dump/restore, not assumed portability of a PostgreSQL directory.
 4. Choose production target/cutover timing and any distinct sandbox hostname; current public URL points to this sandbox app. No production instance or NPM certificate was replaced.
 5. Examine the actual Strava export structure before designing a separate resumable, duplicate-safe Python API importer for recordings, metadata and photos. Do not implement direct database imports.
 
-Maintain this file after meaningful changes. Do not delete the retained synthetic ride without approval. Do not print credentials, Supervisor tokens, private runtime environment, or generated app secrets. Operations and scoped restore commands are in SANDBOX.md.
+Maintain this file after meaningful changes. The owner deleted the earlier synthetic ride. New tests recreate their own fixtures in a dedicated account; cleanup is restricted to exact per-run IDs. Do not print credentials, Supervisor tokens, private runtime environment, or generated app secrets. Operations and scoped restore commands are in SANDBOX.md.
+
+## Repeatable testing — 2026-10-22
+
+Dedicated active regular user: fittrackee_test (fittrackee-test@example.com). A generated password is in local ignored .secrets/live-tests.json with file permissions restricted to the current user/SYSTEM on Windows; never commit or display it. No personal owner credentials are used by the runner.
+
+Use tools/Test-FitTrackee.ps1 from the repository root (or Python 3.10+ tools/live_tests.py). See tests/LIVE_TESTS.md for run, --keep, verify and cleanup commands. Provisioning is one-time via the supported CLI over the existing ha-test SSH alias; ordinary tests use HTTPS only. They require no Docker Desktop and no application update. Default runs generate a unique private ride and checkerboard image, validate description/image/thumbnail, then delete only that run's resources. Kept/failed checkpoints live in ignored .test-results/. A deleted test activity is harmless: the next run creates a new one. State files may contain media URLs; keep them private.
+
+Verified live: initial dedicated-account creation/login, repeat provisioning without password change, kept photo fixture, a second independent run with scoped cleanup, and retained-checkpoint verification. Six offline safety tests pass, including rejection of personal credentials, plain HTTP, cross-origin URLs, foreign checkpoints and changed fixture identities. CI executes offline tests only; no sandbox credentials are published to Actions.
+
+Retained UI fixture: Automated attachment check 5ba8ee8a, checkpoint .test-results/5ba8ee8adf71480182e19c810d33fcc3.json. The owner's original synthetic activity was deleted by the user and is not recreated in that account.
+
+Finding: actual anonymous HTTPS access to a generated photo URL succeeds on upstream FitTrackee 1.3.6. Private media/gallery visibility does not authenticate the static media URL (upstream media/routes.py get_media). Tests use generated images only and report this limitation; no authorization changes were made. Do not assume personal photographs are access-controlled solely by gallery visibility.
+
+No app restart or backup/restore was performed in this tooling session. Use a retained run plus verify for those explicitly scheduled persistence tests; those operations affect the whole app, not only the test account. The installed app remains version 0.1.1.
+
+## Accepted decision: photo-link access — 2026-10-22
+
+The user explicitly accepts FitTrackee 1.3.6 serving an image without login to anyone who can reach the server and knows its exact randomly generated URL. Private gallery visibility does not make the underlying media URL require authentication. This is an upstream application behavior, not a TLS/Nginx Proxy Manager fault.
+
+For this installation used by the user and spouse, retain the existing behavior. It is not a blocker for photo testing, personal photo imports, or the family deployment. No application authorization patch, additional proxy login, or VPN requirement is requested. Keep the observation in test reports as an informational known limitation, not a failing acceptance condition. Do not repeatedly request approval or propose remediation unless the user revisits the decision or the exposure materially changes. Secure cookies, TLS and existing proxy restrictions remain unchanged.
