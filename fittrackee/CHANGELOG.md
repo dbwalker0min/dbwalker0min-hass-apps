@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Add an authenticated, provider-independent external-identity API through the existing Flask application.
+- Persist account-scoped mappings and optional fenced claims in a companion PostgreSQL schema, covered by cold backups.
+- Preserve native workout/media APIs and upstream source files; exclude superseded importer work and private exports.
+
 ## 0.1.1
 
 - Restore ownership of persistent service files at startup after Supervisor backup extraction.

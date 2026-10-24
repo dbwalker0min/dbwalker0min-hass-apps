@@ -8,3 +8,11 @@
 - A production release also needs a real photograph/metadata restore check, archive worker load test and AMD64 HAOS device validation.
 
 For repeatable real HTTPS/photo checks using the dedicated regular account, read [LIVE_TESTS.md](LIVE_TESTS.md). Default runs clean up only their own fixtures; use --keep and a checkpoint for persistence tests. Generated-image upload and delivery have now passed, but photo backup/restore remains pending.
+
+## Companion identity integration
+
+From the repository root on a Docker-capable Linux CI runner: `sh fittrackee/tests/run_identity_tests.sh fittrackee-ha:test`. This boots an isolated container with PostgreSQL, no network, its own disposable volume and example-only options. It runs real cookie/CSRF and OAuth authentication, owner checks, concurrency, claim fencing/recovery, database constraints/deletion cleanup and schema-version tests. The script removes only its own named container/volume. No sandbox credentials, personal archives or existing runtime volumes are mounted.
+
+On Windows, launch the same isolated image and test mounts, wait for the built-in healthcheck, then run `docker exec -e IDENTITY_TEST_MODE=isolated CONTAINER python /tests/test_identity_api.py`. That environment flag is a guard; never set it on the shared Pi instance. Tests create temporary users/workouts and use direct SQL only inside the isolated integration database.
+
+For an exact retained live_tests.py checkpoint in the dedicated regular test account, use `python fittrackee/tools/identity_smoke.py bind --fixture CHECKPOINT --state PRIVATE_COMPANION_CHECKPOINT`. This binds only that existing synthetic workout and creates an unresolved synthetic claim. `verify` checks the mapping, claim and native workout/image hashes across an explicitly scheduled restart/backup/restore; `cleanup` removes only its exact synthetic mapping/claim, keeping the workout/photo. It does not perform HA administration. Companion checkpoints contain test claim secrets; they are ignored and protected like credentials. Never use personal accounts or old-origin checkpoints.

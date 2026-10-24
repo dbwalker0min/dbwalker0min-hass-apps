@@ -5,7 +5,7 @@ RUN apk add --no-cache postgresql18 postgresql18-client postgis redis nginx su-e
 COPY rootfs/ /
 RUN chmod 755 /opt/ha-fittrackee/*.py
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
-LABEL io.hass.name="FitTrackee" io.hass.type="addon" io.hass.version="0.1.1" \
+LABEL io.hass.name="FitTrackee" io.hass.type="addon" io.hass.version="0.1.2" \
       io.hass.arch="aarch64|amd64" \
       org.opencontainers.image.source="https://github.com/dbwalker0min/dbwalker0min-hass-apps"
 EXPOSE 8080

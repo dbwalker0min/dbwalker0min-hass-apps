@@ -37,3 +37,9 @@ Read [PROJECT_STATUS.md](PROJECT_STATUS.md) and [AGENTS.md](AGENTS.md). `legacy/
 Current sandbox details and safe scoped commands: [SANDBOX.md](SANDBOX.md).
 
 Repeatable attachment tests use a separate non-admin account: [tests/LIVE_TESTS.md](tests/LIVE_TESTS.md).
+
+## External activity identities
+
+App 0.1.2 adds a provider-independent authenticated companion API under `/api/external-identities/v1` on the configured external_url. It reuses FitTrackee OAuth/session authentication and the existing PostgreSQL database. See [API contract](EXTERNAL_IDENTITIES_API.md) for mapping, claims, safe retries and backup details. Native workout/upload/update/media APIs remain unchanged.
+
+Bulk archive importing and incremental synchronization are separate projects, not part of this app. No importer package, provider OAuth integration or polling service is shipped here. Private local archives are excluded from Git and Docker contexts.
