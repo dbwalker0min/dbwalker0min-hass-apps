@@ -1,4 +1,4 @@
-# Project status — FitTrackee Home Assistant app
+# Project status â€” FitTrackee Home Assistant app
 
 Updated: 2026-10-23 (America/Los_Angeles)
 
@@ -52,7 +52,7 @@ Original WSL repository /home/dbwal/fittrackee, runtime, account, .env and backu
 
 Maintain this file after meaningful changes. The owner deleted the earlier synthetic ride. New tests recreate their own fixtures in a dedicated account; cleanup is restricted to exact per-run IDs. Do not print credentials, Supervisor tokens, private runtime environment, or generated app secrets. Operations and scoped restore commands are in SANDBOX.md.
 
-## Repeatable testing — 2026-10-22
+## Repeatable testing â€” 2026-10-22
 
 Dedicated active regular user: fittrackee_test (fittrackee-test@example.com). A generated password is in local ignored .secrets/live-tests.json with file permissions restricted to the current user/SYSTEM on Windows; never commit or display it. No personal owner credentials are used by the runner.
 
@@ -66,13 +66,13 @@ Finding: actual anonymous HTTPS access to a generated photo URL succeeds on upst
 
 No app restart or backup/restore was performed in this tooling session. Use a retained run plus verify for those explicitly scheduled persistence tests; those operations affect the whole app, not only the test account. The installed app remains version 0.1.1.
 
-## Accepted decision: photo-link access — 2026-10-22
+## Accepted decision: photo-link access â€” 2026-10-22
 
 The user explicitly accepts FitTrackee 1.3.6 serving an image without login to anyone who can reach the server and knows its exact randomly generated URL. Private gallery visibility does not make the underlying media URL require authentication. This is an upstream application behavior, not a TLS/Nginx Proxy Manager fault.
 
 For this installation used by the user and spouse, retain the existing behavior. It is not a blocker for photo testing, personal photo imports, or the family deployment. No application authorization patch, additional proxy login, or VPN requirement is requested. Keep the observation in test reports as an informational known limitation, not a failing acceptance condition. Do not repeatedly request approval or propose remediation unless the user revisits the decision or the exposure materially changes. Secure cookies, TLS and existing proxy restrictions remain unchanged.
 
-## Scope revision � 2026-10-23
+## Scope revision — 2026-10-23
 
 User explicitly split the system into three separately maintained components. This repository owns only the FitTrackee HA app and its authenticated provider-independent external-identity API. A future PyPI/uvx bulk importer and a separate HA PyScript synchronizer are out of scope. Do not merge or reuse PR #32 importer code, CLI, archive processing, packaging or tests. PR #31 is confirmed merged; #32 can be closed by the user. Its branch preserves the superseded work; private local archive and artifacts remain untouched and excluded locally.
 
@@ -80,7 +80,7 @@ Review completed against merged main and pinned FitTrackee 1.3.6 code. Design is
 
 Preserved operational corrections from the superseded branch: Supervisor external_url was changed to the sandbox hostname and app restarted on October 22. API image and thumbnail URLs then returned valid PNGs with HTTP 200; browser visually rendered the synthetic checkerboard. Production keeps its own hostname. Actual photos are under /data/files/uploads/media/<user ID>/; the test user is 2. No actual Strava archive activities/photos have been uploaded.
 
-## Companion identity API implementation � 2026-10-23
+## Companion identity API implementation — 2026-10-23
 
 New branch fittrackee-external-identities starts from merged main/PR #31. PR #32 is closed and none of its importer/CLI/archive code, package or workflow is included. Its operational hostname/storage corrections were documented independently. No bulk importer, PyScript synchronization or provider-specific API logic is implemented here.
 
@@ -93,3 +93,11 @@ Validation so far: AMD64 image built; 22 integration tests passed against real P
 Sandbox Pi native update to 0.1.2 completed through Supervisor after pre-update backup 4c3450a9. Real HTTPS anonymous companion request returned 401. Dedicated-account native GPX/photo upload, Secure/HttpOnly login, captions, image/thumbnail delivery, companion mapping registration/retry/listing, and uploading-claim contention all passed. App restart preserved mapping/claim and exact image/thumbnail hashes.
 
 Retained generated fixture: Automated attachment check 2ade8553. Native checkpoint .test-results/2ade855349374b67833147d165762e10.json; protected companion checkpoint .test-results/identity-2ade855349374b67833147d165762e10.json includes synthetic claim secrets. The HTTPS-only tools/identity_smoke.py is restricted to an exact retained managed fixture in fittrackee_test, with bind/verify/cleanup commands; it never uploads workouts or controls HA. No real export data was uploaded. Actual Supervisor cold backup bd30333a (0.1.2) was restored with --app local_fittrackee --homeassistant=false. HTTPS verification passed after restore: the mapping still resolves the exact native workout, the unresolved uploading claim still blocks a competitor, native attachment/caption remain intact, and full image/thumbnail SHA256 match the pre-backup checkpoint. This validates the companion and native data at the same restore point. Protected off-device backup and N100 HAOS device verification remain pending.
+
+## Provider-independence clarification
+
+The registry provides idempotency within (FitTrackee user, source, external_id), not cross-provider reconciliation. A first PUT accepts a valid new source without creating a separate provider record; it registers only the explicit existing workout ID supplied by the client. Different providers normally upload/register separate workouts even for the same physical ride. No automatic association, fuzzy matching, merging, cross-provider duplicate reporting or manual reconciliation feature is included. Existing uniqueness, conflict rejection and exact-key claim/recovery behavior are retained; no runtime/schema change or app restart was needed.
+
+Replaced the shared-target multi-source example test with first-use providers registering separate workouts having identical date/title/distance/duration; verifies independence, same-provider retries, remap rejection and scoped deletion. Added independent claims across sources. The registry does not create workouts, so native upload remains the external client's responsibility.
+
+Provider-independence verification: all 23 isolated PostgreSQL/native-auth integration tests passed, including the new first-use-source, identical-ride separation and independent-claim cases. Updated PR #33 documentation/tests; runtime behavior and recovery safeguards are unchanged.

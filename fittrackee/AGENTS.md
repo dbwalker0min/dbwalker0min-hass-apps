@@ -17,3 +17,5 @@ Secrets, actual options, credentials, database files, user uploads and backup ar
 
 ## Repeatable live tests
 Use tools/live_tests.py or tools/Test-FitTrackee.ps1 with the dedicated fittrackee_test account. Never use personal owner credentials for routine checks. Keep .secrets/ and .test-results/ out of Git/images. Cleanup must be exact per-run IDs with identity guards; no bulk deletion/reset. Ordinary test runs must not restart or restore the shared app. See tests/LIVE_TESTS.md and the documented media-URL privacy finding.
+
+External identities provide idempotency only within (user, source, external_id). Keep different providers independent; never add automatic cross-provider association, timestamp/GPS/distance/title matching, merging, duplicate reporting or manual reconciliation features. Sources require no separate registration. Preserve exact-key claims and partial-upload recovery.

@@ -117,16 +117,40 @@ class Identities(unittest.TestCase):
         self.assertEqual(self.call(method='PUT',user=1,data=dict(workout_id=self.workouts[1])).status_code,201)
         self.assertEqual(self.call(user=1).json['workout_id'],self.workouts[1])
 
-    def test_multiple_sources_and_delete_only_mapping(self):
-        self.assertEqual(self.bind().status_code,201)
-        other=PREFIX+'/identities/another/'+self.key
-        self.assertEqual(self.call(other,'PUT',dict(workout_id=self.workouts[0])).status_code,201)
-        result=self.call(PREFIX+'/workouts/'+self.workouts[0]+'/identities')
-        self.assertGreaterEqual(len(result.json['identities']),2)
-        self.assertEqual(self.call(method='DELETE').status_code,204)
-        self.assertEqual(self.call(method='DELETE').status_code,204)
-        self.assertEqual(self.call(other).status_code,200)
-        self.assertEqual(self.call('/api/workouts/'+self.workouts[0]).status_code,200)
+    def test_new_sources_keep_identical_rides_independent(self):
+        # First-use source strings need no provider creation endpoint.
+        path_a=PREFIX+'/identities/first_'+self.key+'/'+self.key
+        path_b=PREFIX+'/identities/second_'+self.key+'/'+self.key
+        with self.app.app_context():
+            original=db.session.get(Workout,self.workout_ids[0])
+            duplicate=Workout(self.users[0],original.sport_id,original.workout_date,
+                              distance=original.distance,duration=original.duration)
+            duplicate.title=original.title
+            db.session.add(duplicate); db.session.commit(); sid=duplicate.short_id; wid=duplicate.id
+        try:
+            self.assertEqual(self.call(path_a,'PUT',dict(workout_id=self.workouts[0])).status_code,201)
+            self.assertEqual(self.call(path_b).status_code,404)
+            self.assertEqual(self.call(path_b,'PUT',dict(workout_id=sid)).status_code,201)
+            self.assertEqual(self.call(path_a).json['workout_id'],self.workouts[0])
+            self.assertEqual(self.call(path_b).json['workout_id'],sid)
+            self.assertNotEqual(self.call(path_a).json['workout_id'],self.call(path_b).json['workout_id'])
+            for path,target in ((path_a,self.workouts[0]),(path_b,sid)):
+                self.assertEqual(self.call(path,'PUT',dict(workout_id=target)).status_code,200)
+            self.assertEqual(self.call(path_a,'PUT',dict(workout_id=sid)).status_code,409)
+            self.assertEqual(self.call(path_a,'DELETE').status_code,204)
+            self.assertEqual(self.call(path_a,'DELETE').status_code,204)
+            self.assertEqual(self.call(path_b).json['workout_id'],sid)
+            self.assertEqual(self.call('/api/workouts/'+self.workouts[0]).status_code,200)
+        finally:
+            self.sql('DELETE FROM public.workouts WHERE id=:id',id=wid)
+
+    def test_claims_are_independent_across_sources(self):
+        other=PREFIX+'/claims/another/'+self.key
+        self.assertEqual(self.call(self.claim,'PUT',{},claim=self.secret).status_code,201)
+        self.assertEqual(self.call(self.claim+'/begin-upload','POST',claim=self.secret).status_code,201)
+        self.assertEqual(self.call(other,'PUT',{},claim=secrets.token_urlsafe(32)).status_code,201)
+        self.assertEqual(self.call().status_code,404)
+        self.assertEqual(self.call(PREFIX+'/identities/another/'+self.key).status_code,404)
 
     def test_concurrent_registration(self):
         with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
