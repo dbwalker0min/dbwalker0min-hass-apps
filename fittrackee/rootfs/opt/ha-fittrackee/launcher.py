@@ -50,7 +50,8 @@ error_log /dev/stderr warn;
 pid /run/nginx.pid;
 events {{ worker_connections 256; }}
 http {{
-  access_log /dev/stdout;
+  map $uri $identity_loggable {{ default 1; ~^/api/external-identities/ 0; }}
+  access_log /dev/stdout combined if=$identity_loggable;
   client_body_temp_path /tmp/nginx-body;
   proxy_temp_path /tmp/nginx-proxy;
   server {{
@@ -175,6 +176,7 @@ def main():
                     '--protected-mode', 'yes', '--dir', str(DATA/'redis'),
                     '--appendonly', 'yes', '--save', '60', '1'])
     run(['su-exec', 'fittrackee', 'ftcli', 'db', 'upgrade'], env=env)
+    run(['su-exec', 'fittrackee', 'python', '/opt/ha-fittrackee/identity_api.py'], env=env)
     env_file = RUN/'app-env.json'
     env_file.write_text(json.dumps(env))
     env_file.chmod(0o600)
@@ -183,7 +185,7 @@ def main():
     spawn('web', ['su-exec', 'fittrackee', 'gunicorn', '-b', '127.0.0.1:8081',
                   '--workers', str(worker_count), '--timeout', '120', '--graceful-timeout', '10',
                   '--forwarded-allow-ips', '127.0.0.1', '--no-control-socket',
-                  '--error-logfile', '-', 'fittrackee:create_app()'], env)
+                  '--error-logfile', '-', '--chdir', '/opt/ha-fittrackee', 'identity_api:create_app()'], env)
     config = RUN/'nginx.conf'
     config.write_text(nginx_config(host, proxies))
     run(['nginx', '-t', '-c', str(config)])

@@ -8,3 +8,5 @@ backups/
 __pycache__/
 *.pyc
 .test-results/
+personal/
+importer/
