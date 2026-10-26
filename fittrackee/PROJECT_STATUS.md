@@ -1,6 +1,6 @@
 # Project status â€” FitTrackee Home Assistant app
 
-Updated: 2026-10-23 (America/Los_Angeles)
+Updated: 2026-10-25 (America/Los_Angeles)
 
 ## Current result
 FitTrackee 1.3.6 is running as Home Assistant app 0.1.2 on the sandbox Raspberry Pi 5. Real HTTPS login, activity upload, restart/update persistence, and a scoped Supervisor cold backup/restore have passed. Bulk importing and incremental synchronization are out of scope for this repository.
@@ -101,3 +101,25 @@ The registry provides idempotency within (FitTrackee user, source, external_id),
 Replaced the shared-target multi-source example test with first-use providers registering separate workouts having identical date/title/distance/duration; verifies independence, same-provider retries, remap rejection and scoped deletion. Added independent claims across sources. The registry does not create workouts, so native upload remains the external client's responsibility.
 
 Provider-independence verification: all 23 isolated PostgreSQL/native-auth integration tests passed, including the new first-use-source, identical-ride separation and independent-claim cases. Updated PR #33 documentation/tests; runtime behavior and recovery safeguards are unchanged.
+
+## Upload watchdog fix — 2026-10-25
+
+User's import received repeated 502 responses while Supervisor marked the app
+unhealthy and replaced its container. Logs correlate the 19:02:02 stop with a
+POST /api/workouts receiving 502 at 19:02:03. The app's one synchronous web worker
+also served both health probes, causing a liveness/contention hazard.
+
+Source version 0.1.3 moves probes to a cached loopback monitor in the lifecycle
+manager. It checks child processes, direct SQL/Redis health and the web listener
+without using a request worker. Bounded probes, stale-state failure, transition
+logs and existing worker/service failure handling remain active. Upstream
+FitTrackee stays pinned to 1.3.6. No deployment, shared app restart, backup/restore,
+claim release or personal-data modification has been performed for this change.
+
+Local AMD64 image build and 39 checks pass: two proxy/security configuration tests,
+seven health unit tests, six live-runner guard tests, the suspended-web-worker
+regression and 23 real-PostgreSQL/native-auth identity tests. The isolated instance
+used synthetic data with no network or shared mounts. Native architecture CI and
+HAOS verification are tracked separately; local Docker success is not device
+verification. Deployment requires pausing the import and a protected current app
+backup before updating. Keep Watchdog enabled with the new health implementation.

@@ -12,9 +12,29 @@ Set `external_url` to `https://fittrackee.dbwalker0min.info` and `trusted_proxy_
 
 Create a proxy host for `fittrackee.dbwalker0min.info`, forwarding using HTTP to the HA host and mapped backend port (or the app's internal hostname:8080 if NPM shares its Supervisor network). Select the existing wildcard certificate and enable Force SSL. NPM must overwrite `X-Forwarded-Proto` with `$scheme`, preserve the host, and forward the request body; allow sufficiently large uploads (256 MB by default here). Do not copy client-provided forwarding headers blindly. Do not forward the backend port at your router.
 
-The bundled HTTP gate allows only the configured proxy IPs and requires `X-Forwarded-Proto: https`. It then overwrites forwarding headers and the canonical Host before forwarding to loopback Gunicorn. Gunicorn trusts only that loopback gate. Production cookie security remains enabled. `/healthz` is an unauthenticated database-health check only. If routing/NAT makes multiple clients appear as one source, enforce the NPM-only boundary in the network firewall as well; an IP allowlist cannot identify traffic hidden behind that shared address.
+The bundled HTTP gate allows only the configured proxy IPs and requires `X-Forwarded-Proto: https`. It then overwrites forwarding headers and the canonical Host before forwarding to loopback Gunicorn. Gunicorn trusts only that loopback gate. Production cookie security remains enabled. `/healthz` is an unauthenticated service-liveness check; it returns only a generic healthy/unhealthy result. If routing/NAT makes multiple clients appear as one source, enforce the NPM-only boundary in the network firewall as well; an IP allowlist cannot identify traffic hidden behind that shared address.
 
 Certificates and renewal stay exclusively in NPM. No ingress or Home Assistant authentication bypass is used. FitTrackee retains its own accounts.
+
+## Health checks during uploads
+
+Version 0.1.3 keeps health probes independent of the synchronous FitTrackee web
+workers. Both Docker and Supervisor use nginx `/healthz`, backed by a loopback-only
+monitor in the lifecycle manager. Every five seconds it checks managed service
+processes, a direct PostgreSQL `SELECT 1`, Redis `PING`, and the Gunicorn TCP
+listener. Service probes have bounded timeouts; results older than twenty seconds
+are unhealthy. Health requests read cached results and never queue a web request
+behind an upload or trigger another database query. Health transitions are logged.
+
+This is liveness, not proof that every application request will succeed. Gunicorn's
+120-second worker timeout still handles stuck requests, and service exits still
+stop the app. A busy single worker can delay browser/API requests without making
+the container unhealthy. No extra public port is opened and the worker count does
+not need to increase. Leave the Home Assistant Watchdog enabled after updating.
+
+Pause any import before an app update, because updating restarts the app. Preserve
+the importer's recovery journal and investigate uncertain uploads separately;
+this fix does not release claims or retry uploads.
 
 ## State, shutdown, and backups
 

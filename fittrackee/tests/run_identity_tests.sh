@@ -26,4 +26,5 @@ for attempt in $(seq 1 120); do
   sleep 2
 done
 if [ "$ready" != true ]; then docker logs "$name"; exit 1; fi
+docker exec -e IDENTITY_TEST_MODE=isolated "$name" python /tests/test_health_integration.py
 docker exec -e IDENTITY_TEST_MODE=isolated "$name" python /tests/test_identity_api.py

@@ -1,8 +1,10 @@
 import importlib.util
 from pathlib import Path
 import unittest
+import sys
 
 path = Path('/opt/ha-fittrackee/launcher.py')
+sys.path.insert(0, str(path.parent))
 spec = importlib.util.spec_from_file_location('launcher', path)
 app = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(app)
@@ -19,6 +21,8 @@ class ConfigurationSecurity(unittest.TestCase):
         self.assertIn('deny all;', config)
         self.assertIn('proxy_set_header X-Forwarded-Proto https;', config)
         self.assertIn('proxy_set_header X-Forwarded-For $remote_addr;', config)
+        self.assertIn('proxy_pass http://127.0.0.1:8082/healthz;', config)
+        self.assertNotIn('/api/check-db', config)
 
     def test_reject_unsafe_options(self):
         for url, ips in [

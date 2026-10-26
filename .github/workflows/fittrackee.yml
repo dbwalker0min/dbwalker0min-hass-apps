@@ -46,5 +46,10 @@ jobs:
           -v "${{ github.workspace }}/fittrackee/tests:/tests:ro"
           -v "${{ github.workspace }}/fittrackee/tools:/tools:ro"
           fittrackee-ha:test /tests/test_live_runner.py
+      - name: Test independent health monitoring
+        run: >-
+          docker run --rm --entrypoint python
+          -v "${{ github.workspace }}/fittrackee/tests:/tests:ro"
+          fittrackee-ha:test /tests/test_health.py
       - name: Test external identity API against isolated PostgreSQL
         run: sh fittrackee/tests/run_identity_tests.sh fittrackee-ha:test

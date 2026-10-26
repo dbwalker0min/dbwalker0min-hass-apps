@@ -16,3 +16,15 @@ From the repository root on a Docker-capable Linux CI runner: `sh fittrackee/tes
 On Windows, launch the same isolated image and test mounts, wait for the built-in healthcheck, then run `docker exec -e IDENTITY_TEST_MODE=isolated CONTAINER python /tests/test_identity_api.py`. That environment flag is a guard; never set it on the shared Pi instance. Tests create temporary users/workouts and use direct SQL only inside the isolated integration database.
 
 For an exact retained live_tests.py checkpoint in the dedicated regular test account, use `python fittrackee/tools/identity_smoke.py bind --fixture CHECKPOINT --state PRIVATE_COMPANION_CHECKPOINT`. This binds only that existing synthetic workout and creates an unresolved synthetic claim. `verify` checks the mapping, claim and native workout/image hashes across an explicitly scheduled restart/backup/restore; `cleanup` removes only its exact synthetic mapping/claim, keeping the workout/photo. It does not perform HA administration. Companion checkpoints contain test claim secrets; they are ignored and protected like credentials. Never use personal accounts or old-origin checkpoints.
+
+## Independent health regression
+
+`test_health.py` uses only the Python standard library and runs both locally and
+inside the app image. It checks bounded service probes, busy listeners, cached
+HTTP health, failure/recovery, stale probes, and sanitized error reporting.
+
+`run_identity_tests.sh` also runs `test_health_integration.py` before the identity
+suite. It uses the same isolated disposable container, suspends only its Gunicorn
+workers, confirms application HTTP is blocked while health stays responsive, then
+resumes workers in a finally block. The IDENTITY_TEST_MODE=isolated guard is
+required; never invoke this test on a shared app. Native AMD64/ARM64 CI runs both.

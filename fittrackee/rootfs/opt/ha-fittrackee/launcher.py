@@ -13,11 +13,14 @@ import sys
 import time
 from urllib.parse import urlsplit
 
+from health_monitor import HealthMonitor, probe_services
+
 DATA = Path('/data')
 RUN = Path('/run/ha-fittrackee')
 PG = '/usr/libexec/postgresql18/'
 children = []
 stopping = False
+health_monitor = None
 
 
 def log(message):
@@ -61,7 +64,9 @@ http {{
     client_max_body_size 256m;
     location = /healthz {{
       access_log off;
-      proxy_pass http://127.0.0.1:8081/api/check-db;
+      proxy_pass http://127.0.0.1:8082/healthz;
+      proxy_connect_timeout 1s;
+      proxy_read_timeout 2s;
     }}
     location / {{
       {allow}
@@ -112,6 +117,8 @@ def stop_requested(*_):
 
 
 def shutdown():
+    if health_monitor is not None:
+        health_monitor.close()
     for name, process in reversed(children):
         if process.poll() is not None:
             continue
@@ -126,6 +133,7 @@ def shutdown():
 
 
 def main():
+    global health_monitor
     signal.signal(signal.SIGTERM, stop_requested)
     signal.signal(signal.SIGINT, stop_requested)
     url, host, proxies, worker_count = options_config(json.loads((DATA/'options.json').read_text()))
@@ -190,6 +198,8 @@ def main():
     config.write_text(nginx_config(host, proxies))
     run(['nginx', '-t', '-c', str(config)])
     spawn('proxy', ['nginx', '-c', str(config), '-g', 'daemon off;'])
+    health_monitor = HealthMonitor(lambda: probe_services(children), log)
+    health_monitor.start()
     log('Services started; TLS is managed by Nginx Proxy Manager')
     while not stopping:
         for name, process in children:
