@@ -13,3 +13,28 @@ The reverse proxy receives only explicit NPM source IPs, requires the TLS scheme
 Legacy WSL deployment remains untouched. Only non-secret tracked files are copied for reference. The new app starts with its own database and generated secrets; importing the existing account requires an explicit logical transfer later, not copying Windows/WSL runtime paths.
 
 The actual Supervisor restore test exposed restored descendant ownership incompatible with service users. Version 0.1.1 repairs ownership recursively at startup before opening PostgreSQL/Redis or uploads. Top-level-only chown was insufficient. The observed Pi starts all bundled services at roughly 350 MiB RAM; full historical-load performance remains untested.
+
+## Independent liveness — 0.1.3
+
+Both Supervisor `/healthz` and Docker's healthcheck now pass through nginx to a
+loopback-only HTTP listener on 127.0.0.1:8082 in the lifecycle manager. Its background
+thread probes live child processes, a direct PostgreSQL SELECT 1 over the private
+Unix socket, Redis PING, and the Gunicorn TCP listener. Each subprocess is bounded
+to two seconds and TCP connection to half a second. Results are refreshed every
+five seconds, cached for HTTP consumers, and fail closed if stale for twenty
+seconds or stopped. No query, credential, process detail or error body is exposed
+by the health endpoint; only transitions with fixed diagnostic labels reach logs.
+
+A single synchronous Gunicorn worker can spend a long time parsing recordings.
+Sending liveness HTTP requests through that worker caused false unhealthy results
+and Supervisor replacement during an in-flight upload. Liveness therefore checks
+the listener without waiting for an application response. Gunicorn retains its
+120-second worker timeout, and the existing lifecycle loop still exits when any
+managed service dies. The monitor closes before service shutdown. Database checks
+are read-only and the Redis probe is PING. No schema, upstream application source,
+TLS trust boundary, public port, privilege grant or persistent path changes.
+
+A disposable-container regression suspends the sole Gunicorn worker, confirms the
+old HTTP database probe cannot respond, verifies nginx/Docker liveness across
+multiple independent probe cycles, resumes the worker, and confirms normal HTTP
+requests recover. This test must never be run against the shared HA instance.

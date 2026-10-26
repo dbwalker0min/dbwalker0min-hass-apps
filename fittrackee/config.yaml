@@ -1,6 +1,6 @@
 name: FitTrackee
 slug: fittrackee
-version: "0.1.2"
+version: "0.1.3"
 description: "Activity tracker with PostgreSQL/PostGIS and background workers"
 url: "https://github.com/dbwalker0min/dbwalker0min-hass-apps/tree/main/fittrackee"
 arch:

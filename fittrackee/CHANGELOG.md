@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.3
+
+- Prevent watchdog restarts during uploads by serving health independently of busy
+  web workers. Both Docker and Supervisor probe cached service liveness through
+  nginx, including direct bounded database/Redis checks and the web listener.
+- Mark failed/stale probes unhealthy and log health transitions. Preserve service
+  exit handling and Gunicorn worker timeouts; no public ports or data formats change.
+- Add a regression test that suspends a disposable instance's web worker while
+  health checks continue, plus dependency-failure and probe-staleness tests.
+
 ## 0.1.2
 
 - Add an authenticated, provider-independent external-identity API through the existing Flask application.
