@@ -3,7 +3,7 @@
 Updated: 2026-10-25 (America/Los_Angeles)
 
 ## Current result
-FitTrackee 1.3.6 is running as Home Assistant app 0.1.2 on the sandbox Raspberry Pi 5. Real HTTPS login, activity upload, restart/update persistence, and a scoped Supervisor cold backup/restore have passed. Bulk importing and incremental synchronization are out of scope for this repository.
+FitTrackee 1.3.6 is running as Home Assistant app 0.1.3 on the sandbox Raspberry Pi 5. Real HTTPS login, activity upload, restart/update persistence, and a scoped Supervisor cold backup/restore have passed. Bulk importing and incremental synchronization are out of scope for this repository.
 
 Active source: C:\Users\dbwal\VSCode\HomeAssistant\dbwalker0min-hass-apps\fittrackee
 Repository: https://github.com/dbwalker0min/dbwalker0min-hass-apps
@@ -13,7 +13,7 @@ Read AGENTS.md, README.md, ARCHITECTURE.md and SANDBOX.md here before continuing
 ## Runtime and network
 - Sandbox SSH alias: ha-test; configured existing hassio user/key. Host ha-test.home / 192.168.99.10.
 - Actual platform: HAOS 18.3, Supervisor 2026.10.3, HA Core 2026.10.1, raspberrypi5-64, aarch64.
-- Supervisor app slug: local_fittrackee, installed from /addons/fittrackee. Version 0.1.2, auto boot and health watchdog enabled.
+- Supervisor app slug: local_fittrackee, installed from /addons/fittrackee. Version 0.1.3, auto boot and health watchdog enabled.
 - Sandbox URL: https://fittrackee-test.dbwalker0min.info. Production URL: https://fittrackee.dbwalker0min.info. Existing NPM on ha.home / 192.168.1.10 terminates TLS using its existing certificate.
 - NPM route points to sandbox 192.168.99.10:3001. App 8080 maps to 3001. Port 3000 belongs to Z-Wave JS UI; it was not changed.
 - Proxy gate trusts only 192.168.1.10, verified in actual access logs. Requires HTTPS forwarding header, replaces Host/forwarded headers, and proxies to loopback Gunicorn. Secure cookies remain enabled. No certificate management in the app.
@@ -123,3 +123,32 @@ used synthetic data with no network or shared mounts. Native architecture CI and
 HAOS verification are tracked separately; local Docker success is not device
 verification. Deployment requires pausing the import and a protected current app
 backup before updating. Keep Watchdog enabled with the new health implementation.
+## 0.1.3 Pi deployment verified — 2026-10-25
+
+User explicitly approved merging and deploying the watchdog fix. PR #34 merged
+as 3c84884 after native AMD64/ARM64 CI passed all configuration, health, busy-worker,
+runner-safety and identity integration checks. No importer process was active.
+An app-only Supervisor cold backup cd674edc completed successfully (approximately
+1,396 MB, stored on HA). This deployment did not restore that backup or create an
+off-device copy; previous verified restore procedures remain applicable.
+
+The merged tracked source was staged into /addons/fittrackee, the store reloaded,
+and local_fittrackee updated through Supervisor. Actual running image is
+local/aarch64-addon-fittrackee:0.1.3, started 2026-10-25 20:41:54 PDT. Supervisor
+reports started with watchdog=true; Docker and the new nginx health probe report
+healthy. Startup logged the expected listener-unavailable transition followed by
+healthy after Gunicorn began listening. There was no manual watchdog disable.
+
+Dedicated-account HTTPS checks passed after the update: the retained synthetic
+workout, photo, thumbnail, description, identity mapping and unresolved synthetic
+claim all match their checkpoints. A fresh generated GPX/photo upload plus Secure/
+HttpOnly login and image/thumbnail checks passed, with cleanup restricted to that
+run's exact workout/media IDs (checkpoint .test-results/82e29786bab74af69c421576ffac5ec3.json).
+No personal activity uploads, claim releases, bulk deletions or origin changes
+were performed. The accepted anonymous-photo-URL behavior remains unchanged.
+
+Independent health was regression-tested by suspending a disposable worker on
+native AMD64/ARM64 CI, not by pausing the shared Pi's worker. Real sustained-import
+verification on the Pi is the next operational observation; the app is ready for
+the user's import to resume. Existing uncertain activities still require their
+normal explicit recovery. No importer state or journal was modified.
